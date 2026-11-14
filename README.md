@@ -46,7 +46,7 @@ Jeder Schritt ist ein Pull Request mit Tests, CHANGELOG und README-Pflege; jedes
 
 | # | Schritt | Ergebnis | Stand |
 |---|---|---|---|
-| 1 | Repo, Pflichtdateien, Grundgerüst, CI, Deployment | leere Seite im Design mit Hell/Dunkel, Health-Check grün (4.0.0) | in Arbeit |
+| 1 | Repo, Pflichtdateien, Grundgerüst, CI, Deployment | leere Seite im Design mit Hell/Dunkel, Health-Check grün | 4.0.0 |
 | 2 | Setup, Migrationen, Schema, Fake-Daten | Installation auf dem Webspace läuft durch | |
 | 3 | Öffentliche Suche | Autovervollständigung, Treffer, Copy auf Fake-Daten | |
 | 4 | Login, Nutzerverwaltung, Audit-Log | Admin-Bereich erreichbar und abgesichert | |

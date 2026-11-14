@@ -4,6 +4,8 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 
 ## [Unreleased]
 
+## [4.0.0] – 2026-11-14
+
 ### Hinzugefügt
 
 - Grundgerüst: Front-Controller, Routenliste mit Login als Standard und expliziter Markierung öffentlicher Routen, Kernel mit Weiterleitung auf die konfigurierte HTTPS-Domain, Fehlerseiten und Fehler-Log mit Größenbegrenzung.
@@ -18,3 +20,6 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 
 - Jede Anfrage endete mit `403`: Die sperrende `.htaccess` im Projektverzeichnis galt auch für `public/`, weil Apache die `.htaccess` der Elternverzeichnisse mit auswertet. Gesperrt sind jetzt nur die Verzeichnisse neben `public/`.
 - Der Deploy bricht ab, bevor etwas übertragen wird, wenn ein Secret fehlt oder `DEPLOY_PATH` kein tiefer absoluter Pfad ist; ein leerer Pfad hätte rsync mit `--delete` auf `/` zielen lassen.
+
+[Unreleased]: https://github.com/tgigold/mash-disclaimer/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/tgigold/mash-disclaimer/releases/tag/v4.0.0

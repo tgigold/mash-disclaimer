@@ -13,3 +13,8 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 - Sicherheits-Header, strikte Content Security Policy, Sperre für Suchmaschinen.
 - CI (Syntax, PHPStan Level 8, PHPUnit, `composer audit`), Deployment per rsync über SSH, Dependabot.
 - Pflichtdateien, README mit Steckbrief und Anleitung für die SSH-Einrichtung, Fachlogik in `docs/fachlogik.md`.
+
+### Behoben
+
+- Jede Anfrage endete mit `403`: Die sperrende `.htaccess` im Projektverzeichnis galt auch für `public/`, weil Apache die `.htaccess` der Elternverzeichnisse mit auswertet. Gesperrt sind jetzt nur die Verzeichnisse neben `public/`.
+- Der Deploy bricht ab, bevor etwas übertragen wird, wenn ein Secret fehlt oder `DEPLOY_PATH` kein tiefer absoluter Pfad ist; ein leerer Pfad hätte rsync mit `--delete` auf `/` zielen lassen.

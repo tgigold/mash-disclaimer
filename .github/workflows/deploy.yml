@@ -46,6 +46,28 @@ jobs:
       - name: Block vendor/
         run: printf 'Require all denied\n' > vendor/.htaccess
 
+      # An empty DEPLOY_PATH would turn the rsync target into "/" – together
+      # with --delete. Stop before anything is transferred.
+      - name: Check deploy settings
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          HEALTH_URL: ${{ vars.HEALTH_URL }}
+        run: |
+          for name in SSH_HOST SSH_USER SSH_KEY SSH_KNOWN_HOSTS DEPLOY_PATH HEALTH_URL; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is not set in the environment 'production'."
+              exit 1
+            fi
+          done
+          case "$DEPLOY_PATH" in
+            /*/*) ;;
+            *) echo "::error::DEPLOY_PATH must be an absolute path at least two levels deep."; exit 1 ;;
+          esac
+
       # H-12: own key, host key pinned
       - name: Set up SSH
         env:

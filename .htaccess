@@ -1,3 +1,0 @@
-# G-1: nothing outside public/ is reachable from the web, even if the
-# document root ever points at the project directory.
-Require all denied

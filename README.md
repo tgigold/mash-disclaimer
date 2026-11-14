@@ -20,7 +20,7 @@ V4 löst die bisherige Version 3 ab. In der Entwicklung läuft sie unter <https:
 | **Server** | Shared Webspace (lab09.de) · PHP 8.5 (FPM) · Document Root zeigt auf `public/` · HTTPS |
 | **Deployment** | rsync über SSH, `main` ist live (in der Entwicklung `tater.lab09.de`) |
 | **Cronjobs** | keine |
-| **Coding-Regeln** | 1.2.0 |
+| **Coding-Regeln** | 1.3.0 |
 
 ### Abweichungen von den Coding-Regeln
 

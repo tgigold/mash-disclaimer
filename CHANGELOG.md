@@ -14,6 +14,10 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 - Sessions mit `__Host-`-Cookie, CSRF-Schutz für jeden POST samt Prüfung von `Origin` und `Sec-Fetch-Site`, Begrenzung der Request-Größe.
 - Datenbanktests gegen MariaDB in der CI.
 
+### Geändert
+
+- Steckbrief auf Coding-Regeln 1.3.0 gehoben (Korrektur von `G-1`, umgesetzt bereits in 4.0.0).
+
 ## [4.0.0] – 2026-11-14
 
 ### Hinzugefügt

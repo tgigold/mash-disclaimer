@@ -4,6 +4,8 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 
 ## [Unreleased]
 
+## [4.1.0] – 2026-11-15
+
 ### Hinzugefügt
 
 - Geführtes Setup unter `/setup`: Setup-Code aus `data/setup-code.txt`, Prüfung der Server-Voraussetzungen, Datenbank-Zugang, erster Admin (Argon2id), optional erfundene Beispielfahrzeuge; schreibt `data/config.php` und sperrt sich danach selbst.
@@ -35,5 +37,6 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 - Jede Anfrage endete mit `403`: Die sperrende `.htaccess` im Projektverzeichnis galt auch für `public/`, weil Apache die `.htaccess` der Elternverzeichnisse mit auswertet. Gesperrt sind jetzt nur die Verzeichnisse neben `public/`.
 - Der Deploy bricht ab, bevor etwas übertragen wird, wenn ein Secret fehlt oder `DEPLOY_PATH` kein tiefer absoluter Pfad ist; ein leerer Pfad hätte rsync mit `--delete` auf `/` zielen lassen.
 
-[Unreleased]: https://github.com/tgigold/mash-disclaimer/compare/v4.0.0...HEAD
+[Unreleased]: https://github.com/tgigold/mash-disclaimer/compare/v4.1.0...HEAD
+[4.1.0]: https://github.com/tgigold/mash-disclaimer/releases/tag/v4.1.0
 [4.0.0]: https://github.com/tgigold/mash-disclaimer/releases/tag/v4.0.0

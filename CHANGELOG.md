@@ -4,6 +4,20 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 
 ## [Unreleased]
 
+### Hinzugefügt
+
+- Geführtes Setup unter `/setup`: Setup-Code aus `data/setup-code.txt`, Prüfung der Server-Voraussetzungen, Datenbank-Zugang, erster Admin (Argon2id), optional erfundene Beispielfahrzeuge; schreibt `data/config.php` und sperrt sich danach selbst.
+- Datenbankschema als Migration `0001`: Einstellungen, Admin-Konten, Audit-Log, Fahrzeuge (Work) und Live-Fahrzeuge, alles `utf8mb4`/InnoDB mit Präfix `v4_`.
+- Migrationen mit automatischem Backup vorher, per Kommandozeile `php85 bin/console migrate`.
+- Disclaimer-Vorlagen als Pflege-Datei `config/disclaimer-templates.php` und `DisclaimerBuilder`, der nur die Felder des jeweiligen Fahrzeugtyps zulässt.
+- Zufällige 8-stellige Fahrzeug-IDs (Crockford-Base32).
+- Sessions mit `__Host-`-Cookie, CSRF-Schutz für jeden POST samt Prüfung von `Origin` und `Sec-Fetch-Site`, Begrenzung der Request-Größe.
+- Datenbanktests gegen MariaDB in der CI.
+
+### Geändert
+
+- Steckbrief auf Coding-Regeln 1.3.0 gehoben (Korrektur von `G-1`, umgesetzt bereits in 4.0.0).
+
 ## [4.0.0] – 2026-11-14
 
 ### Hinzugefügt

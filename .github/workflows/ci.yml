@@ -12,6 +12,20 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Fresh, throwaway database for the integration tests (Q-4). root without a
+    # password, so no password is in the repo (S-44); the container lives only
+    # for this run.
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: '1'
+          MARIADB_DATABASE: tater_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s --health-timeout=5s --health-retries=20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -20,7 +34,7 @@ jobs:
       - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.5'
-          extensions: mbstring, intl
+          extensions: mbstring, intl, pdo_mysql, zlib
           coverage: none
 
       - name: Check syntax
@@ -40,4 +54,11 @@ jobs:
         run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
 
       - name: Tests
-        run: vendor/bin/phpunit
+        env:
+          TATER_TEST_DB_HOST: 127.0.0.1
+          TATER_TEST_DB_PORT: '3306'
+          TATER_TEST_DB_NAME: tater_test
+          TATER_TEST_DB_USER: root
+          TATER_TEST_DB_PASSWORD: ''
+        # --fail-on-skipped: in the CI every database test has to run.
+        run: vendor/bin/phpunit --fail-on-skipped

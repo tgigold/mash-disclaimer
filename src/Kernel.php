@@ -9,39 +9,42 @@ use Lab09\Disclaimer\Http\Request;
 use Lab09\Disclaimer\Http\Response;
 use Lab09\Disclaimer\Http\Route;
 use Lab09\Disclaimer\Http\Router;
+use Lab09\Disclaimer\Security\Csrf;
+use Lab09\Disclaimer\Security\PhpSession;
+use Lab09\Disclaimer\Support\DataDirectory;
 use Lab09\Disclaimer\Support\ErrorLog;
+use Lab09\Disclaimer\Support\Ip;
 use Lab09\Disclaimer\Support\View;
 
 /**
- * Turns a request into a response: canonical HTTPS redirect, routing, access
- * check, controller call, error pages. Has no side effects besides the error log,
- * so tests can drive it directly.
+ * Turns a request into a response: canonical HTTPS redirect, request size,
+ * routing, access check, CSRF check for every POST, controller call, error pages.
  */
 final readonly class Kernel
 {
+    /** E-3: no form of this app needs more; the XLSX upload gets its own limit. */
+    private const int MAX_BODY_BYTES = 65_536;
+
     private Router $router;
 
     /** @param list<Route> $routes */
     public function __construct(
-        private Config $config,
+        private Services $services,
         array $routes,
-        private View $view,
-        private ErrorLog $errorLog,
     ) {
         $this->router = new Router($routes);
     }
 
     public static function boot(): self
     {
-        $config = Config::load(App::rootPath('data/config.php'));
+        $data = new DataDirectory(App::rootPath('data'));
+        $config = Config::load($data->file('config.php'));
         /** @var list<Route> $routes */
         $routes = require App::rootPath('config/routes.php');
 
         return new self(
-            $config,
+            new Services($config, $data, new PhpSession(), new View(App::rootPath('templates')), new ErrorLog($data)),
             $routes,
-            new View(App::rootPath('templates')),
-            new ErrorLog(App::rootPath('data/logs')),
         );
     }
 
@@ -50,7 +53,7 @@ final readonly class Kernel
         try {
             return $this->dispatch($request);
         } catch (\Throwable $e) {
-            $this->errorLog->exception($e);
+            $this->services->errorLog->exception($e);
 
             return $this->errorPage(500, 'Something went wrong', 'Please try again in a moment.');
         }
@@ -61,6 +64,10 @@ final readonly class Kernel
         $redirect = $this->canonicalRedirect($request);
         if ($redirect !== null) {
             return $redirect;
+        }
+
+        if ($request->contentLength() > self::MAX_BODY_BYTES) {
+            return $this->errorPage(413, 'Request too large', 'The request is larger than this form allows.');
         }
 
         $match = $this->router->match($request->method, $request->path);
@@ -82,7 +89,17 @@ final readonly class Kernel
             return $this->notFound();
         }
 
-        $controller = new ($route->controller)($this->view);
+        // S-12, S-14: every POST needs a valid token and must not come from a
+        // foreign site – checked here once instead of in every controller.
+        if ($request->method === 'POST' && !$this->passesCsrf($request)) {
+            return $this->errorPage(
+                403,
+                'Form expired',
+                'Please reload the page and submit the form again.',
+            );
+        }
+
+        $controller = $this->services->controller($route->controller);
         $action = $route->action;
 
         $response = $controller->$action($request);
@@ -93,19 +110,31 @@ final readonly class Kernel
         return $response;
     }
 
+    private function passesCsrf(Request $request): bool
+    {
+        $ok = Csrf::isSameOrigin($request, $this->services->config->baseUrl())
+            && $this->services->csrf()->isValid($request);
+
+        if (!$ok) {
+            $this->services->errorLog->security('rejected CSRF token on ' . $request->path, Ip::shorten($request->remoteAddress()));
+        }
+
+        return $ok;
+    }
+
     /**
      * S-1: always redirect to the configured domain, never to the Host header.
      * Without a config (fresh deploy before setup) public/.htaccess does the job.
      */
     private function canonicalRedirect(Request $request): ?Response
     {
-        $baseUrl = $this->config->baseUrl();
+        $baseUrl = $this->services->config->baseUrl();
         if ($baseUrl === null) {
             return null;
         }
 
         $host = strtolower((string) parse_url($baseUrl, PHP_URL_HOST));
-        if ($request->isHttps($this->config->trustedProxies()) && $request->host() === $host) {
+        if ($request->isHttps($this->services->config->trustedProxies()) && $request->host() === $host) {
             return null;
         }
 
@@ -122,10 +151,10 @@ final readonly class Kernel
     private function errorPage(int $status, string $title, string $message): Response
     {
         try {
-            $body = $this->view->page('error', ['title' => $title, 'message' => $message, 'status' => $status]);
+            $body = $this->services->view->page('error', ['title' => $title, 'message' => $message, 'status' => $status]);
         } catch (\Throwable $e) {
             // The error page itself failed – fall back to plain text instead of a blank page.
-            $this->errorLog->exception($e);
+            $this->services->errorLog->exception($e);
             $body = e($title);
         }
 

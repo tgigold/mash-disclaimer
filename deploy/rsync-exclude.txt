@@ -1,0 +1,22 @@
+# Exclude list for the deployment – rule H-13.
+# Paths starting with / are relative to the project root.
+# Whatever is listed here is neither uploaded nor deleted on the server.
+
+# Does not belong on the server
+/.git/
+/.github/
+/.gitignore
+/.editorconfig
+/deploy/
+/tests/
+/node_modules/
+/phpunit.xml
+/.phpunit.cache/
+/phpstan.neon
+/phpstan-baseline.neon
+/.phpstan.cache/
+.DS_Store
+
+# Lives only on the server and stays untouched:
+# config.php, uploads/, backups/, logs/
+/data/

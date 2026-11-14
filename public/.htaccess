@@ -1,0 +1,43 @@
+# public/.htaccess – rules S-1 to S-5.
+# When the app moves to disclaimer.lab09.de (roadmap step 7), change the domain
+# here and in data/config.php.
+# The headers are deliberately not wrapped in <IfModule>: a missing mod_headers
+# must fail loudly instead of running without protection.
+
+Options -Indexes -MultiViews
+
+RewriteEngine On
+
+# S-1: force HTTPS and the canonical domain, never redirect to the Host header
+RewriteCond %{HTTPS} !=on [OR]
+RewriteCond %{HTTP_HOST} !=tater.lab09.de
+RewriteRule ^ https://tater.lab09.de%{REQUEST_URI} [R=301,L]
+
+# Block hidden files (.git, .env …), .well-known stays reachable
+RewriteRule (^|/)\.(?!well-known/) - [F]
+
+# Everything that is not a file goes to the front controller
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [L]
+
+# S-2: HSTS. No includeSubDomains – not every subdomain of lab09.de is known to speak HTTPS.
+Header always set Strict-Transport-Security "max-age=31536000"
+
+# S-3, S-4: strict CSP, no inline scripts or styles.
+# data: in img-src is needed by Bootstrap for embedded SVG symbols.
+Header always set Content-Security-Policy "default-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+
+# S-5
+Header always set X-Content-Type-Options "nosniff"
+Header always set X-Frame-Options "DENY"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+Header always set Cross-Origin-Opener-Policy "same-origin"
+Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()"
+
+# Not for search engines – on every response, including static files
+Header always set X-Robots-Tag "noindex, nofollow"
+
+# Static files carry the version in their URL (A-6) and may be cached for long
+<FilesMatch "\.(css|js|woff2|svg|png|jpg|jpeg|webp|avif|ico)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+</FilesMatch>

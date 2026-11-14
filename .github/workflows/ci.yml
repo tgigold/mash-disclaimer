@@ -1,0 +1,43 @@
+# CI – rules H-8 to H-10
+name: CI
+
+on:
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.5'
+          extensions: mbstring, intl
+          coverage: none
+
+      - name: Check syntax
+        run: |
+          find . -name '*.php' -not -path './vendor/*' -print0 \
+            | xargs -0 -n1 -P4 php -l > /dev/null
+
+      - name: Validate and install Composer packages
+        run: |
+          composer validate --strict
+          composer install --no-interaction --no-progress
+
+      - name: Known vulnerabilities
+        run: composer audit
+
+      - name: Static analysis
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+
+      - name: Tests
+        run: vendor/bin/phpunit

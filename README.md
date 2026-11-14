@@ -47,7 +47,7 @@ Jeder Schritt ist ein Pull Request mit Tests, CHANGELOG und README-Pflege; jedes
 | # | Schritt | Ergebnis | Stand |
 |---|---|---|---|
 | 1 | Repo, Pflichtdateien, Grundgerüst, CI, Deployment | leere Seite im Design mit Hell/Dunkel, Health-Check grün | 4.0.0 |
-| 2 | Setup, Migrationen, Schema, Fake-Daten | Installation auf dem Webspace läuft durch | |
+| 2 | Setup, Migrationen, Schema, Fake-Daten | Installation auf dem Webspace läuft durch | in Arbeit |
 | 3 | Öffentliche Suche | Autovervollständigung, Treffer, Copy auf Fake-Daten | |
 | 4 | Login, Nutzerverwaltung, Audit-Log | Admin-Bereich erreichbar und abgesichert | |
 | 5 | Fahrzeugverwaltung | Liste, live/zurückziehen, bearbeiten, zurücksetzen, von Hand anlegen, Textgenerator | |
@@ -60,18 +60,24 @@ Jeder Schritt ist ein Pull Request mit Tests, CHANGELOG und README-Pflege; jedes
 
 ```
 public/            Web-Root: index.php, .htaccess, robots.txt, assets/ (css, js, vendor/<name>-<version>/)
-src/               Lab09\Disclaimer: Kernel, Config, Controller/, Http/, Support/
+src/               Lab09\Disclaimer: Kernel, Services, Config,
+                   Controller/, Http/, Security/, Service/, Repository/, Domain/, Database/, Console/, Support/
 templates/         PHP-Templates, jede Ausgabe über e()
-config/            routes.php (alle Routen), config.example.php
+config/            routes.php (alle Routen), disclaimer-templates.php (Pflege-Datei), config.example.php
+migrations/        nummerierte Datenbank-Migrationen 0001_….php
+bin/               console (Kommandozeile)
 docs/              Fachlogik und Planung
-data/              nur auf dem Server: config.php, logs/ (später uploads/, backups/)
+data/              nur auf dem Server: config.php, setup-code.txt, logs/, backups/ (später uploads/)
 deploy/            rsync-exclude.txt
-tests/             Unit/, Kernel/
+tests/             Unit/, Kernel/, Integration/ (gegen MariaDB), Support/
 .github/           CI, Deployment, Dependabot
 ```
 
 - Alle Anfragen, die keine Datei treffen, gehen an `public/index.php`; der `Kernel` leitet auf die konfigurierte Domain um, sucht die Route und ruft den Controller.
 - Alle Routen stehen in `config/routes.php`. Eine Route ist ohne Angabe nur für angemeldete Admins erreichbar; öffentliche Routen sind mit `Access::Public` markiert (`A-3`). Bis zum Login-Schritt antworten nicht öffentliche Routen mit `404`.
+- Jeder POST braucht ein CSRF-Token; der Kernel prüft es zentral, zusammen mit `Origin` und `Sec-Fetch-Site` (`S-12`, `S-14`). Formulare enthalten das Feld `_csrf`.
+- SQL steht nur in `src/Repository/` und in den Migrationen; Logik in `src/Service/`, Controller lesen nur Request und geben eine Response zurück (`A-1`).
+- Die Disclaimer-Texte entstehen in `DisclaimerBuilder` aus den Vorlagen in `config/disclaimer-templates.php`. Eine Vorlage darf nur die Felder ihres Fahrzeugtyps verwenden, sonst startet die App nicht.
 - Die Version steht nur in `src/App.php` (`G-5`); alle Asset-URLs tragen sie (`A-6`).
 - Fremde Dateien liegen unter `public/assets/vendor/<name>-<version>/` samt Lizenz; Stylesheets werden mit Subresource Integrity eingebunden, ein Test prüft die Hashes (`T-5`–`T-7`).
 
@@ -86,9 +92,51 @@ composer test                       # PHPUnit
 composer analyse                    # PHPStan, Level 8
 ```
 
+**Datenbanktests** (`tests/Integration/`) brauchen eine leere Wegwerf-Datenbank und werden ohne sie übersprungen. In der CI läuft dafür MariaDB 10.11 im Container, dort darf kein Test übersprungen werden. Lokal:
+
+```sh
+TATER_TEST_DB_HOST=127.0.0.1 TATER_TEST_DB_NAME=tater_test TATER_TEST_DB_USER=root TATER_TEST_DB_PASSWORD= composer test
+```
+
+Achtung: Die Tests löschen alle `v4_`-Tabellen dieser Datenbank.
+
 Der Server läuft mit PHP 8.5; `composer.json` verlangt deshalb `^8.5` und löst Abhängigkeiten für 8.5 auf. Damit lokal auch PHP 8.4 reicht, ist die Plattform-Prüfung von Composer abgeschaltet – Code nutzt deshalb keine Sprachmittel, die erst mit 8.5 kamen, solange lokal 8.4 läuft. Die CI testet mit 8.5.
 
-Ohne `data/config.php` läuft die App mit den Defaults aus `src/Config.php`; das reicht für die Entwicklung.
+Ohne `data/config.php` läuft die App mit den Defaults aus `src/Config.php`; Startseite und Setup-Formular lassen sich so ansehen. Das Setup selbst braucht HTTPS, weil das Session-Cookie das Präfix `__Host-` trägt.
+
+## Installation
+
+Nach dem ersten Deploy einmalig im Browser (`G-11`):
+
+1. **Datenbank anlegen:** beim Hoster eine leere MySQL/MariaDB-Datenbank mit eigenem Benutzer nur für dieses Projekt (`G-16`, `S-46`).
+2. **`/setup` aufrufen**, z. B. `https://tater.lab09.de/setup`. Beim ersten Aufruf entsteht `data/setup-code.txt`.
+3. **Setup-Code per SFTP lesen** und im Formular eingeben – ohne ihn kann niemand die Instanz übernehmen, der nicht auf den Server kommt.
+4. **Formular ausfüllen:** Adresse der Installation, Datenbank-Zugang, erster Admin (Passwort mindestens 12 Zeichen). Optional die erfundenen Beispielfahrzeuge.
+5. Das Setup prüft PHP-Version und Erweiterungen, legt die Tabellen per Migration an, erzeugt den ersten Admin (Argon2id), schreibt `data/config.php` (nur für den Eigentümer lesbar) und löscht den Setup-Code. Danach antwortet `/setup` mit `404`.
+
+Geht etwas schief (falsche Zugangsdaten, fehlende Rechte), zeigt das Formular den Grund, und es lässt sich erneut abschicken. Eine Datenbank, die schon Admin-Konten dieses Tools enthält, lehnt das Setup ab.
+
+### Beispieldaten
+
+Die Beispielfahrzeuge sind **erfunden** – Namen echter Modelle, aber ausgedachte Werte. Sie dienen nur der Entwicklung, bis der Import fertig ist, und müssen vor dem Live-Gang weg. Ihre Typschlüssel sind fünfstellig und beginnen mit `Z` (`Z0001` …), damit sie nie mit echten Typschlüsseln kollidieren.
+
+```sh
+php85 bin/console sample-data:remove    # entfernen
+php85 bin/console sample-data:load      # wieder anlegen
+```
+
+## Kommandozeile
+
+Per SSH im Projektverzeichnis. Auf dem Webspace ist `php` noch Version 8.3, deshalb immer `php85`:
+
+| Befehl | Wirkung |
+|---|---|
+| `php85 bin/console migrate` | Backup, dann ausstehende Migrationen ausführen |
+| `php85 bin/console migrate:status` | angewandte und ausstehende Migrationen |
+| `php85 bin/console backup` | Backup aller `v4_`-Tabellen nach `data/backups/` |
+| `php85 bin/console sample-data:load` / `:remove` | Beispielfahrzeuge anlegen / entfernen |
+
+Die Migrationen im Browser kommen mit dem Admin-Bereich (Schritt 4/5).
 
 ## Konfiguration
 
@@ -98,6 +146,7 @@ Die Config mit Zugangsdaten liegt auf dem Server unter `data/config.php`, außer
 |---|---|
 | `base_url` | kanonische Adresse; Anfragen auf anderen Hosts oder per HTTP werden dorthin umgeleitet |
 | `trusted_proxies` | IPs von Reverse-Proxys, deren `X-Forwarded-Proto` gilt (sonst leer) |
+| `db` | `host`, `port`, `name`, `user`, `password` der Datenbank; ohne diesen Schlüssel gilt die App als nicht installiert |
 
 ## Deployment
 
@@ -138,8 +187,9 @@ Ist ein Schlüssel verbrannt (`S-47`): neuen Schlüssel nach Schritt 1–5 erzeu
 ## Betrieb
 
 - **Fehler** landen in `data/logs/error.log` (per SFTP lesbar, über das Web gesperrt). Die Datei wird bei 1 MB nach `error.log.1` rotiert, es gibt also höchstens zwei Dateien (`S-50`, `S-51`). Bisher stehen darin keine personenbezogenen Daten.
-- **Backups** der Datenbank entstehen ab Schritt 2 automatisch vor jeder Migration.
-- **Updates** kommen per Merge auf `main`; Datenbank-Migrationen werden danach bewusst ausgelöst (`H-15`).
+- **Backups:** Vor jeder Migration entsteht automatisch ein gzip-komprimierter SQL-Dump aller `v4_`-Tabellen unter `data/backups/`; die 30 neuesten bleiben erhalten. Zurückspielen per phpMyAdmin oder `zcat <datei> | mysql …`.
+- **Updates** kommen per Merge auf `main`; Datenbank-Migrationen werden danach bewusst ausgelöst (`H-15`): `php85 bin/console migrate`.
+- **Audit-Log:** Setup, Anlegen von Admins und Laden der Beispieldaten stehen in `v4_audit_log`, mit gekürzter IP (`D-6`). Die Aufbewahrungsfrist wird mit der „Change history“ in Schritt 4 festgelegt.
 - **Suchmaschinen** sind ausgesperrt: `X-Robots-Tag: noindex, nofollow` auf jeder Antwort und `robots.txt` mit `Disallow: /`.
 
 ## Lizenz

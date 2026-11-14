@@ -1,0 +1,21 @@
+# H-2: never in the repo
+/vendor/
+/node_modules/
+/data/
+/config/config.php
+*.sqlite
+*.log
+
+# Tool caches
+/.phpunit.cache/
+/.phpstan.cache/
+
+# G-18: no instruction files for AI assistants
+CLAUDE.md
+AGENTS.md
+/.claude/
+
+# Local clutter
+.DS_Store
+.idea/
+.vscode/

@@ -1,0 +1,80 @@
+# Deploy – rules H-9 to H-16
+#
+# Environment "production" holds
+#   secrets:  SSH_HOST, SSH_USER, SSH_KEY, SSH_KNOWN_HOSTS, DEPLOY_PATH
+#   variable: HEALTH_URL
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# H-14: never two deployments at once; a running one is not cancelled
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  # H-9: CI runs once more on the merged state
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    needs: ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.5'
+          extensions: mbstring, intl
+          coverage: none
+
+      # T-3: build without development packages
+      - name: Production dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress
+
+      # G-1: vendor/ lies outside public/ and is blocked as well
+      - name: Block vendor/
+        run: printf 'Require all denied\n' > vendor/.htaccess
+
+      # H-12: own key, host key pinned
+      - name: Set up SSH
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      # H-13: --delete only removes what the deployment uploaded itself;
+      # everything in the exclude list stays untouched on the server.
+      - name: Transfer
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          rsync --archive --compress --delete \
+            --exclude-from=deploy/rsync-exclude.txt \
+            -e "ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
+            ./ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH/"
+
+      - name: Health check
+        env:
+          HEALTH_URL: ${{ vars.HEALTH_URL }}
+        run: curl --fail --silent --show-error --max-time 20 --retry 3 --retry-delay 5 "$HEALTH_URL" > /dev/null
+
+      - name: Remove key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

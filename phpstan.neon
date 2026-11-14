@@ -1,0 +1,10 @@
+parameters:
+    level: 8
+    phpVersion: 80500
+    tmpDir: .phpstan.cache
+    paths:
+        - src
+        - config
+        - public
+        - templates
+        - tests

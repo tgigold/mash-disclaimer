@@ -1,2 +1,147 @@
-# mash_disclaimer
-A disclaimer tool for Liganova Mash
+# Disclaimer Tool V4 („Tater“)
+
+Verwaltet die WLTP-Verbrauchs- und CO₂-Werte von Fahrzeugen der BMW Group (BMW, MINI, BMW ALPINA) und erzeugt daraus fertige Disclaimer-Texte nach der deutschen Pkw-EnVKV. Die Suche ist öffentlich: Fahrzeug eingeben, Disclaimer kopieren. Gepflegt werden die Daten in einem Admin-Bereich hinter Login, gespeist aus der XLSX-Datei des Herstellers.
+
+V4 löst die bisherige Version 3 ab. In der Entwicklung läuft sie unter <https://tater.lab09.de>, danach unter `disclaimer.lab09.de`.
+
+## Steckbrief
+
+| | |
+|---|---|
+| **Zweck** | Verbrauchswerte von BMW-Group-Fahrzeugen verwalten und EnVKV-Disclaimer zum Kopieren bereitstellen |
+| **Abhängigkeiten** | mit Composer · Laufzeit: `phpoffice/phpspreadsheet` zum Lesen der XLSX (kommt mit dem Import-Schritt) · Entwicklung: PHPUnit, PHPStan |
+| **Frontend** | Bootstrap 5.3 + Bootstrap Icons, lokal · Schrift: Bricolage Grotesque (woff2, lokal, aus `@fontsource/bricolage-grotesque`) · JavaScript: ja, für Autovervollständigung, Copy, Theme-Umschalter, Admin-Liste · kein Build-Schritt |
+| **Datenbank** | MySQL/MariaDB, Tabellenpräfix `v4_`, eigener Datenbanknutzer |
+| **Zugang** | gemischt: Suche öffentlich, Admin hinter Login (mehrere Nutzer, eine Rolle; jeder Admin kann weitere anlegen) · API: nur intern für die Autovervollständigung, öffentlich lesend |
+| **Personenbezogene Daten** | Admin-Konten (Nutzername), gekürzte IPs in Logs, volle IP nur für die Dauer der Login-Sperre |
+| **Uploads** | XLSX, nur Admins, Höchstgröße 5 MB |
+| **Fremde Dienste** | keine |
+| **Repo** | öffentlich · Lizenz: Unlicense |
+| **Server** | Shared Webspace (lab09.de) · PHP 8.5 (FPM) · Document Root zeigt auf `public/` · HTTPS |
+| **Deployment** | rsync über SSH, `main` ist live (in der Entwicklung `tater.lab09.de`) |
+| **Cronjobs** | keine |
+| **Coding-Regeln** | 1.2.0 |
+
+### Abweichungen von den Coding-Regeln
+
+| Regel | Was hier stattdessen gilt | Warum |
+|---|---|---|
+| `S-29` | Kein Passwort-Reset per E-Mail; ein anderer Admin setzt ein neues Passwort | kleines Team, kein Mailversand im Projekt |
+| `S-38` | Vorerst kein TOTP-Zweitfaktor | kleines Team; steht im Fahrplan unter „Später“ |
+| `D-10` | Kein eigenes Impressum; die Fußzeile verweist auf `https://lab09.de/tater` | Seite ist für Suchmaschinen gesperrt, die Angaben liegen zentral bei lab09.de |
+
+## Regeln für dieses Projekt
+
+Das Projekt folgt den [Coding-Regeln](https://github.com/tgigold/coding-regeln) in der oben genannten Version. Verweise wie `S-12` oder `H-13` in Code, Pull Requests und dieser README beziehen sich auf deren Regelnummern. Wer am Projekt arbeitet – Mensch oder Assistent –, liest vor der Arbeit an einem Thema die passende Datei der Regeln und vor jedem Pull Request die Checkliste.
+
+Für dieses Projekt gilt außerdem:
+
+- Oberfläche in britischem Englisch (`colour`, `licence`, Datum `14 November 2026`), Code und Bezeichner englisch, Dokumentation deutsch.
+- Die fachlichen Entscheidungen – Aufbau der XLSX, Normalisierung der Werte, Disclaimer-Vorlagen, Datenmodell, Ablauf des Imports – stehen in [docs/fachlogik.md](docs/fachlogik.md). Wer davon abweicht, passt das Dokument im selben Pull Request an.
+- Die echte Hersteller-XLSX kommt nicht ins Repo; Tests laufen gegen eine selbst gebaute Datei, die die Sonderfälle nachstellt.
+
+## Fahrplan
+
+Jeder Schritt ist ein Pull Request mit Tests, CHANGELOG und README-Pflege; jedes Feature ist eine Minor-Version.
+
+| # | Schritt | Ergebnis | Stand |
+|---|---|---|---|
+| 1 | Repo, Pflichtdateien, Grundgerüst, CI, Deployment | leere Seite im Design mit Hell/Dunkel, Health-Check grün (4.0.0) | in Arbeit |
+| 2 | Setup, Migrationen, Schema, Fake-Daten | Installation auf dem Webspace läuft durch | |
+| 3 | Öffentliche Suche | Autovervollständigung, Treffer, Copy auf Fake-Daten | |
+| 4 | Login, Nutzerverwaltung, Audit-Log | Admin-Bereich erreichbar und abgesichert | |
+| 5 | Fahrzeugverwaltung | Liste, live/zurückziehen, bearbeiten, zurücksetzen, von Hand anlegen, Textgenerator | |
+| 6 | Import | Upload, Einlesen, Prüfschritt, Übernehmen, Frontend-Sperre | |
+| 7 | Ablösung V3 | Umzug auf `disclaimer.lab09.de`, V3 abschalten | |
+
+**Später:** Rollen, Passwort-Reset per E-Mail, Zwei-Faktor-Anmeldung (`S-29`, `S-38`); MINI und BMW ALPINA, sobald deren Dateien vorliegen.
+
+## Aufbau
+
+```
+public/            Web-Root: index.php, .htaccess, robots.txt, assets/ (css, js, vendor/<name>-<version>/)
+src/               Lab09\Disclaimer: Kernel, Config, Controller/, Http/, Support/
+templates/         PHP-Templates, jede Ausgabe über e()
+config/            routes.php (alle Routen), config.example.php
+docs/              Fachlogik und Planung
+data/              nur auf dem Server: config.php, logs/ (später uploads/, backups/)
+deploy/            rsync-exclude.txt
+tests/             Unit/, Kernel/
+.github/           CI, Deployment, Dependabot
+```
+
+- Alle Anfragen, die keine Datei treffen, gehen an `public/index.php`; der `Kernel` leitet auf die konfigurierte Domain um, sucht die Route und ruft den Controller.
+- Alle Routen stehen in `config/routes.php`. Eine Route ist ohne Angabe nur für angemeldete Admins erreichbar; öffentliche Routen sind mit `Access::Public` markiert (`A-3`). Bis zum Login-Schritt antworten nicht öffentliche Routen mit `404`.
+- Die Version steht nur in `src/App.php` (`G-5`); alle Asset-URLs tragen sie (`A-6`).
+- Fremde Dateien liegen unter `public/assets/vendor/<name>-<version>/` samt Lizenz; Stylesheets werden mit Subresource Integrity eingebunden, ein Test prüft die Hashes (`T-5`–`T-7`).
+
+## Lokale Entwicklung
+
+Voraussetzungen: PHP 8.4 oder neuer mit `mbstring`, Composer.
+
+```sh
+composer install
+php -S localhost:8000 -t public     # dann http://localhost:8000
+composer test                       # PHPUnit
+composer analyse                    # PHPStan, Level 8
+```
+
+Der Server läuft mit PHP 8.5; `composer.json` verlangt deshalb `^8.5` und löst Abhängigkeiten für 8.5 auf. Damit lokal auch PHP 8.4 reicht, ist die Plattform-Prüfung von Composer abgeschaltet – Code nutzt deshalb keine Sprachmittel, die erst mit 8.5 kamen, solange lokal 8.4 läuft. Die CI testet mit 8.5.
+
+Ohne `data/config.php` läuft die App mit den Defaults aus `src/Config.php`; das reicht für die Entwicklung.
+
+## Konfiguration
+
+Die Config mit Zugangsdaten liegt auf dem Server unter `data/config.php`, außerhalb des Web-Roots und nie im Repo (`G-14`). Ein Beispiel ohne echte Werte steht in [config/config.example.php](config/config.example.php). Jeder Schlüssel ist optional, Defaults stehen im Code (`G-13`). Ab Schritt 2 schreibt das geführte Setup die Datei.
+
+| Schlüssel | Bedeutung |
+|---|---|
+| `base_url` | kanonische Adresse; Anfragen auf anderen Hosts oder per HTTP werden dorthin umgeleitet |
+| `trusted_proxies` | IPs von Reverse-Proxys, deren `X-Forwarded-Proto` gilt (sonst leer) |
+
+## Deployment
+
+Jeder Merge auf `main` geht nach grüner CI automatisch live (`H-9`, `H-11`):
+
+1. `.github/workflows/deploy.yml` ruft die CI auf dem gemergten Stand auf.
+2. Composer installiert ohne Entwicklungspakete, `vendor/` bekommt eine sperrende `.htaccess`.
+3. rsync über SSH überträgt das Projekt. Was in [deploy/rsync-exclude.txt](deploy/rsync-exclude.txt) steht – vor allem `data/` mit Config, Logs, Uploads und Backups –, wird weder hochgeladen noch auf dem Server gelöscht (`H-13`).
+4. Der Workflow ruft den Health-Check <https://tater.lab09.de/health> auf; antwortet er nicht mit `200`, schlägt das Deployment sichtbar fehl (`H-14`).
+
+**Zugangsdaten:** Host, Benutzer, Zielpfad, privater Deploy-Schlüssel und Host-Key liegen ausschließlich als Secrets im GitHub-Environment `production` (`SSH_HOST`, `SSH_USER`, `SSH_KEY`, `SSH_KNOWN_HOSTS`, `DEPLOY_PATH`), die Health-Check-URL als Variable `HEALTH_URL`. Der Deploy-Schlüssel gehört nur zu diesem Projekt (`S-46`). Zugriff haben die Maintainer des Repos.
+
+**Zurückrollen:** per Revert-Pull-Request, der wie jede Änderung durch die CI geht (`H-16`).
+
+### SSH zwischen GitHub und Server einrichten
+
+Einmalig beim Aufsetzen des Projekts, oder wenn der Deploy-Schlüssel ersetzt werden muss:
+
+1. **Schlüssel erzeugen** (lokal, ohne Passphrase, nur für dieses Projekt):
+   `ssh-keygen -t ed25519 -N '' -C 'deploy mash-disclaimer' -f ./deploy_key`
+2. **Öffentlichen Teil auf dem Server hinterlegen:** Inhalt von `deploy_key.pub` als eigene Zeile an `~/.ssh/authorized_keys` des SSH-Benutzers anhängen (beim Hoster in der Verwaltungsoberfläche oder per SSH). Die Zeile darf mit Optionen eingeschränkt werden, etwa `from="…"`, solange rsync funktioniert.
+3. **Host-Key ermitteln und prüfen:** `ssh-keyscan -t ed25519 <host>` liefert die Zeile für `SSH_KNOWN_HOSTS`. Den Fingerabdruck (`ssh-keygen -lf <(ssh-keyscan -t ed25519 <host>)`) mit der Angabe des Hosters abgleichen – nie blind übernehmen.
+4. **Secrets setzen** (per `gh`, Werte nie in Chat, Commit oder Log):
+   ```sh
+   gh api -X PUT repos/tgigold/mash-disclaimer/environments/production
+   gh secret set SSH_KEY         --env production < deploy_key
+   gh secret set SSH_KNOWN_HOSTS --env production < known_hosts_line
+   gh secret set SSH_HOST        --env production
+   gh secret set SSH_USER        --env production
+   gh secret set DEPLOY_PATH     --env production   # Projektverzeichnis, das public/ enthält
+   gh variable set HEALTH_URL    --env production --body 'https://tater.lab09.de/health'
+   ```
+5. **Privaten Schlüssel löschen:** `rm deploy_key` – er liegt danach nur noch in GitHub.
+6. **Probelauf:** Vor dem ersten Deploy `rsync --dry-run` gegen den Server laufen lassen, damit nichts Unerwartetes gelöscht wird.
+
+Ist ein Schlüssel verbrannt (`S-47`): neuen Schlüssel nach Schritt 1–5 erzeugen, den alten aus `authorized_keys` entfernen.
+
+## Betrieb
+
+- **Fehler** landen in `data/logs/error.log` (per SFTP lesbar, über das Web gesperrt). Die Datei wird bei 1 MB nach `error.log.1` rotiert, es gibt also höchstens zwei Dateien (`S-50`, `S-51`). Bisher stehen darin keine personenbezogenen Daten.
+- **Backups** der Datenbank entstehen ab Schritt 2 automatisch vor jeder Migration.
+- **Updates** kommen per Merge auf `main`; Datenbank-Migrationen werden danach bewusst ausgelöst (`H-15`).
+- **Suchmaschinen** sind ausgesperrt: `X-Robots-Tag: noindex, nofollow` auf jeder Antwort und `robots.txt` mit `Disallow: /`.
+
+## Lizenz
+
+Der Code steht unter der [Unlicense](LICENSE). Mitgelieferte Bibliotheken und Schriften behalten ihre Lizenzen, siehe [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).

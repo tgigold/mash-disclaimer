@@ -1,0 +1,261 @@
+/*
+ * Disclaimer Tool – own styles on top of Bootstrap 5.
+ * Colours are CSS variables per theme; Bootstrap reads its --bs-* variables,
+ * our own components read --tater-*.
+ */
+
+/* Bricolage Grotesque, latin subset, only the weights in use (T-6) */
+@font-face {
+    font-family: 'Bricolage Grotesque';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    src: url('../vendor/bricolage-grotesque-5.3.0/bricolage-grotesque-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Bricolage Grotesque';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 600;
+    src: url('../vendor/bricolage-grotesque-5.3.0/bricolage-grotesque-latin-600-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Bricolage Grotesque';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 700;
+    src: url('../vendor/bricolage-grotesque-5.3.0/bricolage-grotesque-latin-700-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Bricolage Grotesque';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 800;
+    src: url('../vendor/bricolage-grotesque-5.3.0/bricolage-grotesque-latin-800-normal.woff2') format('woff2');
+}
+
+:root,
+[data-bs-theme="light"] {
+    --tater-violet: rgb(125, 124, 150);
+    --tater-pink: rgb(172, 78, 149);
+    --tater-blue: rgb(67, 92, 118);
+    --tater-bg: rgb(246, 244, 238);
+    --tater-surface: #fff;
+    --tater-text: #111;
+    --tater-muted: #55545e;
+    --tater-border: rgb(222, 219, 210);
+    --tater-shadow: 0 10px 30px rgba(40, 36, 20, 0.08);
+    --tater-accent: var(--tater-blue);
+    --tater-accent-contrast: #fff;
+
+    --bs-body-bg: var(--tater-bg);
+    --bs-body-color: var(--tater-text);
+    --bs-secondary-color: var(--tater-muted);
+    --bs-border-color: var(--tater-border);
+    --bs-link-color: var(--tater-blue);
+    --bs-link-color-rgb: 67, 92, 118;
+    --bs-link-hover-color: var(--tater-pink);
+    --bs-link-hover-color-rgb: 172, 78, 149;
+    --bs-focus-ring-color: rgba(67, 92, 118, 0.35);
+}
+
+[data-bs-theme="dark"] {
+    --tater-violet: rgb(160, 159, 186);
+    --tater-pink: rgb(214, 120, 190);
+    --tater-blue: rgb(128, 160, 194);
+    --tater-bg: rgb(22, 22, 26);
+    --tater-surface: rgb(34, 34, 40);
+    --tater-text: rgb(240, 238, 232);
+    --tater-muted: rgb(170, 168, 180);
+    --tater-border: rgb(58, 58, 68);
+    --tater-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    --tater-accent: rgb(92, 122, 154);
+    --tater-accent-contrast: #fff;
+
+    --bs-body-bg: var(--tater-bg);
+    --bs-body-color: var(--tater-text);
+    --bs-secondary-color: var(--tater-muted);
+    --bs-border-color: var(--tater-border);
+    --bs-link-color: var(--tater-blue);
+    --bs-link-color-rgb: 128, 160, 194;
+    --bs-link-hover-color: var(--tater-pink);
+    --bs-link-hover-color-rgb: 214, 120, 190;
+    --bs-focus-ring-color: rgba(128, 160, 194, 0.4);
+}
+
+:root {
+    --bs-body-font-family: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+}
+
+.page {
+    flex: 1 0 auto;
+    width: 100%;
+    max-width: 56rem;
+    margin: 0 auto;
+    padding: 5.5rem 1.25rem 3rem;
+}
+
+/* Theme switcher, top right */
+.theme-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    color: var(--tater-muted);
+    font-size: 1.15rem;
+    line-height: 1;
+    padding: 0.5rem;
+    border-radius: 50%;
+    text-decoration: none;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+    color: var(--tater-text);
+    background: var(--tater-surface);
+}
+
+[data-bs-theme="light"] .theme-icon-dark,
+[data-bs-theme="dark"] .theme-icon-light {
+    display: none;
+}
+
+/* Hero */
+.hero {
+    text-align: center;
+}
+
+.brand-dots {
+    display: inline-flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.brand-dots span {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: var(--tater-violet);
+}
+
+.brand-dots span:nth-child(2) {
+    background: var(--tater-pink);
+}
+
+.brand-dots span:nth-child(3) {
+    background: var(--tater-blue);
+}
+
+.hero-title {
+    font-weight: 800;
+    font-size: clamp(2.25rem, 5vw, 3rem);
+    letter-spacing: -0.03em;
+    margin-bottom: 0.5rem;
+}
+
+.hero-lead {
+    color: var(--tater-muted);
+    font-size: 1.05rem;
+    margin-bottom: 2.25rem;
+}
+
+.error-status {
+    color: var(--tater-pink);
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+/* Search field */
+.search {
+    position: relative;
+    max-width: 44rem;
+    margin: 0 auto;
+}
+
+.search-input {
+    width: 100%;
+    height: 4.5rem;
+    padding: 0 5rem 0 1.75rem;
+    font-size: 1.25rem;
+    color: var(--tater-text);
+    background: var(--tater-surface);
+    border: 1px solid var(--tater-border);
+    border-radius: 999px;
+    box-shadow: var(--tater-shadow);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.search-input::placeholder {
+    color: var(--tater-muted);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--tater-blue);
+    box-shadow: var(--tater-shadow), 0 0 0 0.25rem var(--bs-focus-ring-color);
+}
+
+.search-input:disabled {
+    cursor: not-allowed;
+}
+
+.search-button {
+    position: absolute;
+    top: 50%;
+    right: 0.75rem;
+    width: 3rem;
+    height: 3rem;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    color: var(--tater-accent-contrast);
+    background: var(--tater-accent);
+    border: 0;
+    border-radius: 50%;
+    font-size: 1.1rem;
+}
+
+.search-button:disabled {
+    opacity: 0.6;
+}
+
+.search-note {
+    margin-top: 1.25rem;
+    color: var(--tater-muted);
+    font-size: 0.9rem;
+}
+
+/* Footer */
+.site-footer {
+    width: 100%;
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 1.5rem 1.25rem 2.5rem;
+    border-top: 1px solid var(--tater-border);
+    font-size: 0.9rem;
+}
+
+.site-footer nav {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    color: var(--tater-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}

@@ -12,12 +12,15 @@ final readonly class Request
     /**
      * @param array<string, string> $query
      * @param array<string, string> $server
+     * @param array<string, mixed> $body Parsed POST body, types untouched so
+     *                                   validation can reject arrays (E-2)
      */
     public function __construct(
         public string $method,
         public string $path,
         public array $query = [],
         public array $server = [],
+        public array $body = [],
     ) {
     }
 
@@ -26,11 +29,15 @@ final readonly class Request
         $uri = (string) ($_SERVER['REQUEST_URI'] ?? '/');
         $path = parse_url($uri, PHP_URL_PATH);
 
+        /** @var array<string, mixed> $body */
+        $body = $_POST;
+
         return new self(
             strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')),
             is_string($path) && $path !== '' ? $path : '/',
             self::strings($_GET),
             self::strings($_SERVER),
+            $body,
         );
     }
 
@@ -47,9 +54,9 @@ final readonly class Request
             return true;
         }
 
-        $remote = $this->server['REMOTE_ADDR'] ?? '';
+        $remote = $this->remoteAddress();
         if ($remote !== '' && in_array($remote, $trustedProxies, true)) {
-            return strtolower($this->server['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
+            return strtolower($this->header('X-Forwarded-Proto') ?? '') === 'https';
         }
 
         return false;
@@ -57,7 +64,24 @@ final readonly class Request
 
     public function host(): string
     {
-        return strtolower($this->server['HTTP_HOST'] ?? '');
+        return strtolower($this->header('Host') ?? '');
+    }
+
+    public function header(string $name): ?string
+    {
+        $key = 'HTTP_' . strtoupper(str_replace('-', '_', $name));
+
+        return $this->server[$key] ?? null;
+    }
+
+    public function remoteAddress(): string
+    {
+        return $this->server['REMOTE_ADDR'] ?? '';
+    }
+
+    public function contentLength(): int
+    {
+        return (int) ($this->server['CONTENT_LENGTH'] ?? 0);
     }
 
     /**

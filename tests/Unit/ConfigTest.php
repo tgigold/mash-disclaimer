@@ -15,6 +15,8 @@ final class ConfigTest extends TestCase
 
         self::assertNull($config->baseUrl());
         self::assertSame([], $config->trustedProxies());
+        self::assertNull($config->database());
+        self::assertFalse($config->isInstalled());
     }
 
     public function testExampleConfigIsValid(): void
@@ -22,6 +24,34 @@ final class ConfigTest extends TestCase
         $config = Config::load(dirname(__DIR__, 2) . '/config/config.example.php');
 
         self::assertSame('https://tater.lab09.de', $config->baseUrl());
+        self::assertSame(3306, $config->database()?->port);
+    }
+
+    public function testExportedConfigLoadsBackIdentically(): void
+    {
+        $values = [
+            'base_url' => 'https://a.example',
+            'trusted_proxies' => [],
+            'db' => ['host' => 'localhost', 'port' => 3307, 'name' => 'n', 'user' => 'u', 'password' => "p'\"\\\$x"],
+        ];
+        $file = sys_get_temp_dir() . '/tater-config-' . bin2hex(random_bytes(4)) . '.php';
+        file_put_contents($file, Config::export($values));
+
+        try {
+            $db = Config::load($file)->database();
+            self::assertNotNull($db);
+            self::assertSame("p'\"\\\$x", $db->password);
+            self::assertSame(3307, $db->port);
+        } finally {
+            unlink($file);
+        }
+    }
+
+    public function testDatabasePasswordIsHiddenInDumps(): void
+    {
+        $db = Config::withDefaults(['db' => ['host' => 'h', 'port' => 1, 'name' => 'n', 'user' => 'u', 'password' => 'top-secret']])->database();
+
+        self::assertStringNotContainsString('top-secret', print_r($db, true));
     }
 
     public function testTrailingSlashIsRemoved(): void

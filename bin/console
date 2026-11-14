@@ -1,0 +1,25 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/*
+ * Command line entry point. On the webspace: php85 bin/console <command>
+ */
+
+use Lab09\Disclaimer\App;
+use Lab09\Disclaimer\Console\Console;
+use Lab09\Disclaimer\Support\DataDirectory;
+
+if (PHP_SAPI !== 'cli') {
+    exit(1);
+}
+
+require dirname(__DIR__) . '/vendor/autoload.php';
+
+try {
+    exit((new Console(new DataDirectory(App::rootPath('data'))))->run(array_values($argv)));
+} catch (\Throwable $e) {
+    fwrite(STDERR, 'Error: ' . $e->getMessage() . PHP_EOL);
+    exit(1);
+}

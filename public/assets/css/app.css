@@ -234,6 +234,65 @@ body {
     font-size: 0.9rem;
 }
 
+/* Panels: forms and messages such as the setup */
+.panel {
+    max-width: 36rem;
+    margin: 0 auto;
+    padding: 2.5rem;
+    background: var(--tater-surface);
+    border: 1px solid var(--tater-border);
+    border-radius: 1.25rem;
+    box-shadow: var(--tater-shadow);
+}
+
+.panel-title {
+    font-weight: 800;
+    font-size: 2rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.75rem;
+}
+
+.panel-lead {
+    color: var(--tater-muted);
+    margin-bottom: 1.75rem;
+}
+
+.panel legend {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.form-control,
+.form-check-input {
+    background-color: var(--tater-surface);
+    border-color: var(--tater-border);
+}
+
+.form-control:focus {
+    border-color: var(--tater-blue);
+    box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
+}
+
+.form-check-input:checked {
+    background-color: var(--tater-accent);
+    border-color: var(--tater-accent);
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--tater-accent);
+    --bs-btn-border-color: var(--tater-accent);
+    --bs-btn-color: var(--tater-accent-contrast);
+    --bs-btn-hover-bg: var(--tater-pink);
+    --bs-btn-hover-border-color: var(--tater-pink);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: var(--tater-pink);
+    --bs-btn-active-border-color: var(--tater-pink);
+    --bs-btn-focus-shadow-rgb: 67, 92, 118;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
 /* Footer */
 .site-footer {
     width: 100%;

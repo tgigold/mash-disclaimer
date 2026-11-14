@@ -8,6 +8,7 @@
 /.gitignore
 /.editorconfig
 /deploy/
+/docs/
 /tests/
 /node_modules/
 /phpunit.xml

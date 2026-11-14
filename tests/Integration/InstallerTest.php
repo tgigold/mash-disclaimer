@@ -55,7 +55,7 @@ final class InstallerTest extends DatabaseTestCase
         self::assertFileDoesNotExist($this->app->data->file(SetupCode::FILE));
         $installed = new TestApp($config);
         try {
-            self::assertSame(404, $installed->request('GET', '/setup')->status);
+            self::assertSame(404, $installed->request('GET', '/setup', server: ['HTTPS' => 'on', 'HTTP_HOST' => 'tater.example'])->status);
         } finally {
             $installed->cleanUp();
         }

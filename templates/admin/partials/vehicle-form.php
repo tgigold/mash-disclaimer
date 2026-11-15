@@ -89,6 +89,7 @@ $action = $detail === null ? '/admin/vehicles' : '/admin/vehicles/' . $detail->v
                 <option value="<?= e($brand->value) ?>"<?= $value('brand', $vehicle?->brand->value ?? 'BMW') === $brand->value ? ' selected' : '' ?>><?= e($brand->value) ?></option>
 <?php endforeach ?>
             </select>
+<?php if ($error('brand') !== null): ?><div class="invalid-feedback"><?= e($error('brand')) ?></div><?php endif ?>
         </div>
         <div class="col-6">
             <label class="form-label" for="v-drivetrain">Type</label>

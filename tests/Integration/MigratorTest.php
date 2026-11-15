@@ -100,7 +100,7 @@ final class MigratorTest extends DatabaseTestCase
         $this->migrator()->migrate();
 
         self::assertSame([], $this->migrator()->migrate());
-        self::assertSame(3, $this->countRows('SELECT COUNT(*) FROM v4_migrations'));
+        self::assertSame(4, $this->countRows('SELECT COUNT(*) FROM v4_migrations'));
     }
 
     public function testBackupIsWrittenBeforeANewMigration(): void

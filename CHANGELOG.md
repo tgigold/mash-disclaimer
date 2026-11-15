@@ -12,6 +12,14 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 - Download der Originaldatei als `[Originalname]-[Uploaddatum].xlsx`.
 - Migration `0003`: Importe und Staging-Tabelle.
 - `phpoffice/phpspreadsheet` als Laufzeit-Abhängigkeit; das Setup prüft zusätzlich `intl`, `zip`, `xmlreader`, `gd` und `fileinfo`.
+- Dashboard zeigt das Datum des letzten Imports.
+
+### Geändert
+
+- Fahrzeug-Adressen sind nur noch `/vehicles/{id}`, ohne Namensanhang; ein Umbenennen ändert die Adresse nicht mehr. Alte Adressen mit Anhang leiten per 301 um.
+- Einheitliche Rundungen: Buttons, Eingabefelder und Boxen haben denselben Radius. Ganz rund sind nur noch Labels (Typ, Status, Hinweise), damit nichts Rundes anklickbar wirkt.
+- Updates sind aus der Hauptnavigation auf die Seite Change history gewandert.
+- Im Prüfschritt des Imports sind neue Fahrzeuge nicht mehr vorausgewählt; ein Kästchen im Spaltenkopf wählt alle aus.
 
 ## [4.4.0] – 2026-11-15
 

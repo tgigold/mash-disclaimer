@@ -6,7 +6,6 @@ namespace Lab09\Disclaimer\Tests\Unit;
 
 use Lab09\Disclaimer\Controller\HomeController;
 use Lab09\Disclaimer\Domain\SearchQuery;
-use Lab09\Disclaimer\Domain\Slug;
 use Lab09\Disclaimer\Http\Access;
 use Lab09\Disclaimer\Http\Route;
 use Lab09\Disclaimer\Http\Router;
@@ -45,13 +44,6 @@ final class SearchPartsTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         SearchQuery::fromInput($input);
-    }
-
-    public function testSlugs(): void
-    {
-        self::assertSame('bmw-m2-coupe', Slug::from('BMW M2 Coupé'));
-        self::assertSame('bmw-m3-competition-sedan-with-m-xdrive', Slug::from('BMW M3 Competition Sedan with M xDrive'));
-        self::assertSame('vehicle', Slug::from('—'));
     }
 
     public function testRouteParameters(): void

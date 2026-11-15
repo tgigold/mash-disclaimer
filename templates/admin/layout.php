@@ -24,7 +24,6 @@ $nav = [
     'import' => ['/admin/import', 'Import', 'bi-file-earmark-arrow-up'],
     'users' => ['/admin/users', 'Users', 'bi-people'],
     'history' => ['/admin/history', 'Change history', 'bi-clock-history'],
-    'updates' => ['/admin/updates', 'Updates', 'bi-arrow-repeat'],
 ];
 ?>
 <!doctype html>

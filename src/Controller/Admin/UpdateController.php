@@ -33,7 +33,7 @@ final class UpdateController extends AdminController
 
     public function index(Request $request): Response
     {
-        return $this->page('updates', 'Updates', 'updates', $this->updates->status() + ['error' => null]);
+        return $this->page('updates', 'Updates', 'history', $this->updates->status() + ['error' => null]);
     }
 
     public function migrate(Request $request): Response
@@ -41,7 +41,7 @@ final class UpdateController extends AdminController
         try {
             $applied = $this->updates->migrate($this->actor(), self::ip($request));
         } catch (\RuntimeException $e) {
-            return $this->page('updates', 'Updates', 'updates', $this->updates->status() + ['error' => $e->getMessage()], 500);
+            return $this->page('updates', 'Updates', 'history', $this->updates->status() + ['error' => $e->getMessage()], 500);
         }
 
         return $this->redirectWith('/admin/updates', $applied === []

@@ -1,6 +1,7 @@
 /*
  * Admin vehicle page: live preview of the disclaimer while typing, value fields
- * that follow the chosen type, and filters that apply on change. Without
+ * that follow the chosen type, and filters that apply on change. Import
+ * review: a box in the column head ticks or clears all boxes of the column. Without
  * JavaScript everything still works with the normal forms; the preview then
  * updates on save.
  */
@@ -10,6 +11,20 @@
     // Filters: apply selects at once.
     document.querySelectorAll('form[data-autosubmit] select').forEach((select) => {
         select.addEventListener('change', () => select.form.requestSubmit());
+    });
+
+    // "Select all" boxes: hidden without JavaScript, they follow the column.
+    document.querySelectorAll('input[data-check-all]').forEach((all) => {
+        const boxes = [...document.querySelectorAll(`input[type="checkbox"][name="${CSS.escape(all.dataset.checkAll)}"]`)];
+        const sync = () => {
+            const ticked = boxes.filter((box) => box.checked).length;
+            all.checked = ticked > 0 && ticked === boxes.length;
+            all.indeterminate = ticked > 0 && ticked < boxes.length;
+        };
+        all.hidden = false;
+        all.addEventListener('change', () => boxes.forEach((box) => { box.checked = all.checked; }));
+        boxes.forEach((box) => box.addEventListener('change', sync));
+        sync();
     });
 
     const form = document.querySelector('[data-vehicle-form]');

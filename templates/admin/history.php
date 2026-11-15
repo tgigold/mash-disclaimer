@@ -49,7 +49,10 @@ $describe = static function (array $details): string {
 };
 ?>
 <section class="admin-card">
-    <p class="text-body-secondary">Entries are kept for 24 months; shortened IP addresses for 90 days.</p>
+    <div class="history-head">
+        <p class="text-body-secondary mb-0">Entries are kept for 24 months; shortened IP addresses for 90 days.</p>
+        <a class="btn btn-outline-secondary btn-sm" href="/admin/updates"><i class="bi bi-arrow-repeat" aria-hidden="true"></i> Updates</a>
+    </div>
 <?php if ($entries === []): ?>
     <p class="mb-0">Nothing has happened yet.</p>
 <?php else: ?>

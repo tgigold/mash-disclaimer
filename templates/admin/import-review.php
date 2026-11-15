@@ -83,11 +83,11 @@ $statusText = [
         <p class="mb-0 text-body-secondary">No new type codes.</p>
 <?php else: ?>
         <table class="table admin-table align-middle mb-0">
-            <thead><tr><th scope="col">Import</th><th scope="col">Live</th><th scope="col">Type code</th><th scope="col">Name in the file</th><th scope="col">Type</th><th scope="col">Values</th></tr></thead>
+            <thead><tr><th scope="col"><label class="check-all"><input class="form-check-input" type="checkbox" data-check-all="import_new[]" aria-label="Import all new vehicles" hidden> Import</label></th><th scope="col">Live</th><th scope="col">Type code</th><th scope="col">Name in the file</th><th scope="col">Type</th><th scope="col">Values</th></tr></thead>
             <tbody>
 <?php foreach ($items['new'] as $item): ?>
                 <tr>
-                    <td><input class="form-check-input" type="checkbox" name="import_new[]" value="<?= e($item['id']) ?>" checked aria-label="Import <?= e($item['source_name']) ?>"></td>
+                    <td><input class="form-check-input" type="checkbox" name="import_new[]" value="<?= e($item['id']) ?>" aria-label="Import <?= e($item['source_name']) ?>"></td>
                     <td><?= $liveBox($item) ?></td>
                     <td><?= e($item['type_code']) ?></td>
                     <td><?= e($item['source_name']) ?></td>

@@ -72,7 +72,7 @@ final class SearchTest extends DatabaseTestCase
         // Z0002 (BMW M2 Coupé) exists in the work table but is not live.
         self::assertSame([], $this->names('M2'));
         self::assertSame([], $this->names('Z0002'));
-        self::assertSame(404, $this->get('/vehicles/' . $this->id('Z0002') . '/bmw-m2-coupe')->status);
+        self::assertSame(404, $this->get('/vehicles/' . $this->id('Z0002'))->status);
     }
 
     public function testLikeWildcardsAreLiteral(): void
@@ -87,7 +87,7 @@ final class SearchTest extends DatabaseTestCase
 
         self::assertSame(1, $body['meta']['count']);
         self::assertSame(['id', 'name', 'type_code', 'series', 'drivetrain', 'disclaimer', 'url'], array_keys($body['data'][0]));
-        self::assertSame('/vehicles/' . $this->id('Z0007') . '/bmw-i5-edrive40-sedan', $body['data'][0]['url']);
+        self::assertSame('/vehicles/' . $this->id('Z0007'), $body['data'][0]['url']);
         self::assertStringStartsWith('BMW i5 eDrive40 Sedan. WLTP energy consumption combined: 18.9-15.9 kWh/100 km', $body['data'][0]['disclaimer']);
     }
 
@@ -112,20 +112,20 @@ final class SearchTest extends DatabaseTestCase
         $body = $this->get('/', ['q' => 'sedan'])->body;
 
         self::assertStringContainsString('4 matches – choose a vehicle', $body);
-        self::assertStringContainsString('href="/vehicles/' . $this->id('Z0001') . '/bmw-m3-competition-sedan-with-m-xdrive"', $body);
+        self::assertStringContainsString('href="/vehicles/' . $this->id('Z0001') . '"', $body);
     }
 
-    public function testVehiclePageRedirectsToCanonicalSlug(): void
+    public function testVehiclePermalinkIsTheIdAndOldSlugAddressesRedirect(): void
     {
         $id = $this->id('Z0009');
 
-        $wrong = $this->get('/vehicles/' . $id . '/old-name');
-        self::assertSame(301, $wrong->status);
-        self::assertSame('/vehicles/' . $id . '/mini-cooper-se', $wrong->header('Location'));
+        foreach (['/old-name', '/mini-cooper-se'] as $slug) {
+            $old = $this->get('/vehicles/' . $id . $slug);
+            self::assertSame(301, $old->status);
+            self::assertSame('/vehicles/' . $id, $old->header('Location'));
+        }
 
-        self::assertSame(301, $this->get('/vehicles/' . $id)->status);
-
-        $right = $this->get('/vehicles/' . $id . '/mini-cooper-se');
+        $right = $this->get('/vehicles/' . $id);
         self::assertSame(200, $right->status);
         self::assertStringContainsString('<title>MINI Cooper SE · Disclaimer Tool</title>', $right->body);
     }

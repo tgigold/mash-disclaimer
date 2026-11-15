@@ -87,7 +87,7 @@ Die Startseite ist die öffentliche Suche. Gesucht wird nur in Live-Fahrzeugen, 
 
 - **Ohne JavaScript** ist das Feld ein normales GET-Formular: `/?q=…` zeigt bei einem Treffer direkt den Disclaimer, bei mehreren eine Liste mit Links, sonst „No match“.
 - **Mit JavaScript** (`public/assets/js/search.js`) erscheinen beim Tippen Vorschläge. Pfeiltasten wählen aus, Enter zeigt das Fahrzeug, Esc schließt die Liste und leert beim zweiten Mal das Feld. Alles passiert ohne Seitenwechsel, der Fokus bleibt im Feld, die URL wird mitgeführt, und Zurück/Vor funktionieren. „Copy“ legt den Disclaimer in die Zwischenablage.
-- Jedes Fahrzeug hat eine feste Adresse `/vehicles/{id}/{slug}`. Der Slug ist Kosmetik; ein falscher oder fehlender leitet per 301 auf den richtigen um (`A-5`).
+- Jedes Fahrzeug hat eine feste Adresse `/vehicles/{id}` (`A-5`). Sie ändert sich nicht, wenn das Fahrzeug umbenannt wird. Alte Adressen mit Namensanhang (`/vehicles/{id}/{slug}`, bis 4.5) leiten per 301 dorthin um.
 - Unter dem leeren Feld schlägt „Try:“ die Modellreihen mit den meisten Live-Fahrzeugen vor.
 - Rate-Limit: 120 Seitenaufrufe bzw. 300 API-Anfragen pro Minute und gekürzter IP. Gezählt wird in `data/ratelimit/` mit gehashten Schlüsseln, ältere Minuten werden laufend gelöscht.
 
@@ -97,12 +97,12 @@ Unter `/admin`, erreichbar über „Dashboard“ in der Fußzeile. Jede Seite do
 
 | Bereich | Inhalt |
 |---|---|
-| Dashboard | Kennzahlen (Fahrzeuge, live, Entwürfe, aktive Admins), Hinweis auf ausstehende Updates |
+| Dashboard | Kennzahlen (Fahrzeuge, live, Entwürfe, aktive Admins, Datum des letzten Imports), Hinweis auf ausstehende Updates |
 | Vehicles | Liste aller Fahrzeuge mit Filtern und Seitenleiste zum Bearbeiten, siehe unten |
 | Import | Hersteller-XLSX hochladen, prüfen, übernehmen, siehe unten |
 | Users | Admins anlegen, neues Passwort setzen, deaktivieren und reaktivieren. Jede Aktion fragt das eigene Passwort ab (`S-35`). Das letzte aktive Konto lässt sich nicht deaktivieren. |
 | Change history | das Audit-Log, neueste zuerst, 50 je Seite |
-| Updates | ausstehende Datenbank-Migrationen ansehen und mit Backup ausführen (`G-12`); „Regenerate texts“ nach einer Änderung der Disclaimer-Vorlagen |
+| Updates (verlinkt unter Change history) | ausstehende Datenbank-Migrationen ansehen und mit Backup ausführen (`G-12`); „Regenerate texts“ nach einer Änderung der Disclaimer-Vorlagen |
 | Konto (Name oben rechts) | eigenes Passwort ändern, eigene Daten als JSON herunterladen, eigenes Konto löschen (`D-8`) |
 
 **Fahrzeuge**

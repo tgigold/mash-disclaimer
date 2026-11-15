@@ -6,6 +6,7 @@ declare(strict_types=1);
  * @var array{vehicles: int, live: int} $counts
  * @var int $activeUsers
  * @var list<string> $pending
+ * @var string|null $lastImport UTC
  */
 ?>
 <?php if ($pending !== []): ?>
@@ -31,6 +32,14 @@ declare(strict_types=1);
     <div class="stat">
         <span class="stat-value"><?= e($activeUsers) ?></span>
         <span class="stat-label">Active admins</span>
+    </div>
+    <div class="stat">
+<?php if ($lastImport === null): ?>
+        <span class="stat-value stat-value-text">Never</span>
+<?php else: $at = new \DateTimeImmutable($lastImport, new \DateTimeZone('UTC')); ?>
+        <span class="stat-value stat-value-text"><time datetime="<?= e($at->format('Y-m-d\\TH:i\\Z')) ?>" title="<?= e($at->format('j F Y, H:i')) ?> UTC"><?= e($at->format('j M Y')) ?></time></span>
+<?php endif ?>
+        <span class="stat-label">Last import</span>
     </div>
 </div>
 

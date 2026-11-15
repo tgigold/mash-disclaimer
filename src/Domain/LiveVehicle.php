@@ -19,15 +19,10 @@ final readonly class LiveVehicle
     ) {
     }
 
-    /** Cosmetic part of the URL (A-5); the id alone identifies the vehicle. */
-    public function slug(): string
-    {
-        return Slug::from($this->name);
-    }
-
+    /** Permalink (A-5): the id only, so a renamed vehicle keeps its address. */
     public function path(): string
     {
-        return '/vehicles/' . rawurlencode($this->id) . '/' . rawurlencode($this->slug());
+        return '/vehicles/' . rawurlencode($this->id);
     }
 
     /** "31HJ · G80", leaving out what is missing. */

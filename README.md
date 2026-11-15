@@ -51,7 +51,7 @@ Jeder Schritt ist ein Pull Request mit Tests, CHANGELOG und README-Pflege; jedes
 | 3 | Öffentliche Suche | Autovervollständigung, Treffer, Copy auf Fake-Daten | 4.2.0 |
 | 4 | Login, Nutzerverwaltung, Audit-Log | Admin-Bereich erreichbar und abgesichert | 4.3.0 |
 | 5 | Fahrzeugverwaltung | Liste, live/zurückziehen, bearbeiten, zurücksetzen, von Hand anlegen, Textgenerator | 4.4.0 |
-| 6 | Import | Upload, Einlesen, Prüfschritt, Übernehmen, Frontend-Sperre | in Arbeit |
+| 6 | Import | Upload, Einlesen, Prüfschritt, Übernehmen, Frontend-Sperre | 4.5.0 |
 | 7 | Ablösung V3 | Umzug auf `disclaimer.lab09.de`, V3 abschalten | |
 
 **Später:** Rollen, Passwort-Reset per E-Mail, Zwei-Faktor-Anmeldung (`S-29`, `S-38`); MINI und BMW ALPINA, sobald deren Dateien vorliegen.

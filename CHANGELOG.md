@@ -4,6 +4,8 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 
 ## [Unreleased]
 
+## [4.5.0] – 2026-11-15
+
 ### Hinzugefügt
 
 - Import der Hersteller-XLSX unter Admin → Import: Upload (oder erneute Verwendung einer früheren Datei), Prüfschritt mit neuen, geänderten, unveränderten, entfallenen und Problem-Fahrzeugen, Zusammenführen von Hand angelegter Fahrzeuge, Wahl der Live-Fahrzeuge, Übernahme in einer Transaktion nach Backup, Abbruch.
@@ -25,7 +27,6 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 ### Behoben
 
 - Reichweiten stehen jetzt von niedrig nach hoch (`455-456` statt `456-455`); alle anderen Werte bleiben hoch–niedrig. Migration `0004` dreht gespeicherte Reichweiten im Bestand und in den Live-Texten um.
-
 - Suche: Wer tippte und sofort Enter drückte, bekam manchmal kein Ergebnis, weil die verzögerten Vorschläge die volle Suche abbrachen und sich über das Ergebnis legten. Das galt auch für „Zurück“ im Browser. Vorschläge und volle Suche haben jetzt getrennte Anfragen, und Enter verwirft ausstehende Vorschläge.
 
 ## [4.4.0] – 2026-11-15
@@ -106,7 +107,8 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 - Jede Anfrage endete mit `403`: Die sperrende `.htaccess` im Projektverzeichnis galt auch für `public/`, weil Apache die `.htaccess` der Elternverzeichnisse mit auswertet. Gesperrt sind jetzt nur die Verzeichnisse neben `public/`.
 - Der Deploy bricht ab, bevor etwas übertragen wird, wenn ein Secret fehlt oder `DEPLOY_PATH` kein tiefer absoluter Pfad ist; ein leerer Pfad hätte rsync mit `--delete` auf `/` zielen lassen.
 
-[Unreleased]: https://github.com/tgigold/mash-disclaimer/compare/v4.4.0...HEAD
+[Unreleased]: https://github.com/tgigold/mash-disclaimer/compare/v4.5.0...HEAD
+[4.5.0]: https://github.com/tgigold/mash-disclaimer/releases/tag/v4.5.0
 [4.4.0]: https://github.com/tgigold/mash-disclaimer/releases/tag/v4.4.0
 [4.3.0]: https://github.com/tgigold/mash-disclaimer/releases/tag/v4.3.0
 [4.2.0]: https://github.com/tgigold/mash-disclaimer/releases/tag/v4.2.0

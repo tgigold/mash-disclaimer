@@ -24,12 +24,12 @@ PREVIEW = 'document.querySelector("[data-preview]").textContent'
 def signed_in(path):
     b = Browser(DEBUG_PORT, BASE_URL + '/login?next=' + path)
     # The browser keeps the session between tests; then /login forwards at once.
-    if b.js(f'location.pathname === {path!r}'):
+    if b.js(f'location.pathname + location.search === {path!r}'):
         return b
     b.js(f'document.getElementById("login-username").value = {ADMIN_USER!r}')
     b.js(f'document.getElementById("login-password").value = {ADMIN_PASSWORD!r}')
     b.js('document.querySelector("form[action=\\"/login\\"]").submit()')
-    b.wait(f'location.pathname === {path!r} && document.readyState === "complete"', timeout=10)
+    b.wait(f'location.pathname + location.search === {path!r} && document.readyState === "complete"', timeout=10)
     return b
 
 

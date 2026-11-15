@@ -78,7 +78,8 @@ final class AccountController extends AdminController
         } catch (ValidationException $e) {
             return $this->show(['delete_password' => $e->errors['user'] ?? 'Not possible.'], 'delete');
         }
-        $this->auth->logout($request->remoteAddress());
+        // The account is gone, so no "signed out" entry that would point to it.
+        $this->auth->endSession();
 
         return Response::redirect('/login?deleted=1', 303);
     }

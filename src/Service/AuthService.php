@@ -153,6 +153,14 @@ final class AuthService
         $this->current = null;
     }
 
+    /** Ends the session without an audit entry, e.g. after the account was deleted. */
+    public function endSession(): void
+    {
+        $this->session->destroy();
+        $this->current = null;
+        $this->resolved = true;
+    }
+
     /** S-35: asks for the own password again before sensitive actions. */
     public function confirmPassword(User $user, #[\SensitiveParameter] string $password): bool
     {

@@ -219,7 +219,7 @@ final class VehicleAdminTest extends DatabaseTestCase
         self::assertSame('19.0-16.0', $detail->vehicle->values['electric_consumption']);
         self::assertSame('19.0-16.0', $detail->liveValues['electric_consumption'] ?? null);
         self::assertFalse($detail->isEdited);
-        self::assertStringContainsString('WLTP electric range: 580-500 km.', (string) $detail->liveText);
+        self::assertStringContainsString('electric range: 580-500 km.', (string) $detail->liveText);
     }
 
     public function testGoLiveWithMissingValuesIsRefused(): void
@@ -263,7 +263,7 @@ final class VehicleAdminTest extends DatabaseTestCase
             'name' => 'Test BEV', 'brand' => 'BMW', 'drivetrain' => 'BEV',
             'value_electric_consumption' => '15 / 14', 'value_co2_class' => 'A', 'value_electric_range' => '400',
         ], $this->server())->body, true);
-        self::assertSame('Test BEV. WLTP energy consumption combined: 15-14 kWh/100 km; WLTP CO₂ emissions combined: 0 g/km; CO₂ class: A; WLTP electric range: 400 km.', $ok['text'] ?? null);
+        self::assertSame('Test BEV. Mandatory information according to German law \'Pkw-EnVKV\' based on WLTP: energy consumption combined: 15-14 kWh/100 km; CO₂ emissions combined: 0 g/km; CO₂ class: A; electric range: 400 km.', $ok['text'] ?? null);
 
         $bad = json_decode($this->admin->post('/admin/vehicles/preview', ['name' => 'x', 'brand' => 'BMW', 'drivetrain' => 'BEV'], $this->server())->body, true);
         self::assertNull($bad['text']);

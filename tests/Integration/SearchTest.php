@@ -88,7 +88,7 @@ final class SearchTest extends DatabaseTestCase
         self::assertSame(1, $body['meta']['count']);
         self::assertSame(['id', 'name', 'type_code', 'series', 'drivetrain', 'disclaimer', 'url'], array_keys($body['data'][0]));
         self::assertSame('/vehicles/' . $this->id('Z0007'), $body['data'][0]['url']);
-        self::assertStringStartsWith('BMW i5 eDrive40 Sedan. WLTP energy consumption combined: 18.9-15.9 kWh/100 km', $body['data'][0]['disclaimer']);
+        self::assertStringStartsWith('BMW i5 eDrive40 Sedan. Mandatory information according to German law \'Pkw-EnVKV\' based on WLTP: energy consumption combined: 18.9-15.9 kWh/100 km', $body['data'][0]['disclaimer']);
     }
 
     public function testApiLimitIsRespected(): void
@@ -103,7 +103,7 @@ final class SearchTest extends DatabaseTestCase
         $body = $this->get('/', ['q' => 'iX'])->body;
 
         self::assertStringContainsString('<h2 class="result-title">BMW iX xDrive60</h2>', $body);
-        self::assertStringContainsString('WLTP electric range: 701-596 km.', $body);
+        self::assertStringContainsString('electric range: 701-596 km.', $body);
         self::assertStringContainsString('Z0008 · I20', $body);
     }
 

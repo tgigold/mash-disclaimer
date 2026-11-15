@@ -50,7 +50,7 @@ Jeder Schritt ist ein Pull Request mit Tests, CHANGELOG und README-Pflege; jedes
 | 2 | Setup, Migrationen, Schema, Fake-Daten | Installation auf dem Webspace läuft durch | 4.1.0 |
 | 3 | Öffentliche Suche | Autovervollständigung, Treffer, Copy auf Fake-Daten | 4.2.0 |
 | 4 | Login, Nutzerverwaltung, Audit-Log | Admin-Bereich erreichbar und abgesichert | 4.3.0 |
-| 5 | Fahrzeugverwaltung | Liste, live/zurückziehen, bearbeiten, zurücksetzen, von Hand anlegen, Textgenerator | in Arbeit |
+| 5 | Fahrzeugverwaltung | Liste, live/zurückziehen, bearbeiten, zurücksetzen, von Hand anlegen, Textgenerator | |
 | 6 | Import | Upload, Einlesen, Prüfschritt, Übernehmen, Frontend-Sperre | |
 | 7 | Ablösung V3 | Umzug auf `disclaimer.lab09.de`, V3 abschalten | |
 

@@ -4,6 +4,8 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 
 ## [Unreleased]
 
+## [4.3.0] – 2026-11-15
+
 ### Hinzugefügt
 
 - Fahrzeugverwaltung unter Admin → Vehicles: Liste mit Kennzahlen, Filtern nach Typ, Status und Herkunft und Suche; Seitenleiste zum Bearbeiten mit Vorschau des Disclaimers beim Tippen.

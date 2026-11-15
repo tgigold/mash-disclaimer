@@ -22,7 +22,8 @@ class Browser:
         self._socket = self._connect(tab['webSocketDebuggerUrl'])
         self._id = 0
         self.call('Runtime.enable')
-        self.wait('document.readyState === "complete"')
+        # A new tab first reports about:blank as "complete" – wait for the real page.
+        self.wait('location.href !== "about:blank" && document.readyState === "complete"', timeout=15)
 
     # ---- protocol ----
 

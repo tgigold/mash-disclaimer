@@ -46,7 +46,8 @@ final readonly class Installer
         if ($this->phpVersionId < 80500) {
             $missing[] = 'PHP 8.5 or newer (this server runs ' . PHP_VERSION . ').';
         }
-        foreach (['pdo_mysql', 'mbstring', 'zlib'] as $extension) {
+        // pdo_mysql for the database; zip, xmlreader and gd for reading the XLSX (PhpSpreadsheet).
+        foreach (['pdo_mysql', 'mbstring', 'zlib', 'intl', 'zip', 'xmlreader', 'gd', 'fileinfo'] as $extension) {
             if (!extension_loaded($extension)) {
                 $missing[] = 'The PHP extension ' . $extension . '.';
             }

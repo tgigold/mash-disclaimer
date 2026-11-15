@@ -44,9 +44,10 @@ final class MigratorTest extends DatabaseTestCase
     {
         $applied = $this->migrator()->migrate();
 
-        self::assertSame(['0001_initial_schema', '0002_login_protection'], $applied);
-        self::assertSame(
-            ['v4_audit_log', 'v4_known_devices', 'v4_login_attempts', 'v4_migrations', 'v4_settings', 'v4_users', 'v4_vehicles', 'v4_vehicles_live'],
+        self::assertSame(['0001_initial_schema', '0002_login_protection', '0003_imports'], $applied);
+        // The collation may sort "v4_imports" before "v4_import_items"; the order does not matter.
+        self::assertEqualsCanonicalizing(
+            ['v4_audit_log', 'v4_import_items', 'v4_imports', 'v4_known_devices', 'v4_login_attempts', 'v4_migrations', 'v4_settings', 'v4_users', 'v4_vehicles', 'v4_vehicles_live'],
             (new SchemaRepository($this->pdo))->projectTables(),
         );
         self::assertSame([], $this->migrator()->pending());
@@ -73,7 +74,7 @@ final class MigratorTest extends DatabaseTestCase
         $this->migrator()->migrate();
 
         self::assertSame([], $this->migrator()->migrate());
-        self::assertSame(2, $this->countRows('SELECT COUNT(*) FROM v4_migrations'));
+        self::assertSame(3, $this->countRows('SELECT COUNT(*) FROM v4_migrations'));
     }
 
     public function testBackupIsWrittenBeforeANewMigration(): void

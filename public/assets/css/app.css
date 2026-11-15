@@ -1009,6 +1009,82 @@ body {
     }
 }
 
+/* Admin: import */
+.lock-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 1.5rem;
+    color: #fff;
+    background: var(--tater-pink);
+}
+
+.lock-banner a {
+    color: #fff;
+}
+
+.lock-banner form {
+    margin: 0 0 0 auto;
+}
+
+.lock-banner .btn-primary {
+    --bs-btn-bg: #fff;
+    --bs-btn-color: var(--tater-pink);
+    --bs-btn-border-color: #fff;
+    --bs-btn-hover-bg: var(--tater-bg);
+    --bs-btn-hover-color: var(--tater-pink);
+    --bs-btn-hover-border-color: var(--tater-bg);
+}
+
+.import-steps {
+    padding-left: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.import-steps li {
+    margin-bottom: 0.35rem;
+}
+
+.import-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.import-plain-list {
+    columns: 2 22rem;
+    padding: 0;
+    list-style: none;
+}
+
+.import-plain-list li {
+    padding: 0.2rem 0;
+}
+
+.import-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}
+
+.import-abort {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.admin-table del {
+    color: var(--tater-muted);
+}
+
+.admin-table ins {
+    text-decoration: none;
+    font-weight: 600;
+}
+
 /* Footer */
 .site-footer {
     width: 100%;

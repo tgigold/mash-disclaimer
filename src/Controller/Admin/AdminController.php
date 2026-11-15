@@ -23,6 +23,9 @@ abstract class AdminController extends Controller
 {
     private const string FLASH = 'flash';
 
+    /** @var array{since: \DateTimeImmutable, by: string|null, import_id: int|null}|null */
+    private ?array $lock = null;
+
     public function __construct(
         View $view,
         protected readonly AuthService $auth,
@@ -30,6 +33,12 @@ abstract class AdminController extends Controller
         protected readonly Session $session,
     ) {
         parent::__construct($view);
+    }
+
+    /** @param array{since: \DateTimeImmutable, by: string|null, import_id: int|null}|null $lock */
+    public function showLock(?array $lock): void
+    {
+        $this->lock = $lock;
     }
 
     protected function actor(): User
@@ -52,6 +61,7 @@ abstract class AdminController extends Controller
             'actor' => $this->actor(),
             'csrfToken' => $this->csrf->token(),
             'flash' => is_string($flash) ? $flash : null,
+            'lock' => $this->lock,
         ]), $status);
     }
 

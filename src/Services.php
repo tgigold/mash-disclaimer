@@ -6,7 +6,9 @@ namespace Lab09\Disclaimer;
 
 use Lab09\Disclaimer\Controller\Admin\AccountController;
 use Lab09\Disclaimer\Controller\Admin\DashboardController;
+use Lab09\Disclaimer\Controller\Admin\AdminController;
 use Lab09\Disclaimer\Controller\Admin\HistoryController;
+use Lab09\Disclaimer\Controller\Admin\ImportController;
 use Lab09\Disclaimer\Controller\Admin\UpdateController;
 use Lab09\Disclaimer\Controller\Admin\UserController;
 use Lab09\Disclaimer\Controller\Admin\VehicleController;
@@ -17,10 +19,13 @@ use Lab09\Disclaimer\Controller\HomeController;
 use Lab09\Disclaimer\Controller\LoginController;
 use Lab09\Disclaimer\Controller\SetupController;
 use Lab09\Disclaimer\Database\Database;
+use Lab09\Disclaimer\Import\ImportParser;
 use Lab09\Disclaimer\Repository\AuditLogRepository;
+use Lab09\Disclaimer\Repository\ImportRepository;
 use Lab09\Disclaimer\Repository\LiveVehicleRepository;
 use Lab09\Disclaimer\Repository\LoginProtectionRepository;
 use Lab09\Disclaimer\Repository\SchemaRepository;
+use Lab09\Disclaimer\Repository\SettingsRepository;
 use Lab09\Disclaimer\Repository\UserRepository;
 use Lab09\Disclaimer\Repository\VehicleRepository;
 use Lab09\Disclaimer\Security\Csrf;
@@ -30,6 +35,8 @@ use Lab09\Disclaimer\Security\SetupCode;
 use Lab09\Disclaimer\Service\AuthService;
 use Lab09\Disclaimer\Service\BackupService;
 use Lab09\Disclaimer\Service\DisclaimerBuilder;
+use Lab09\Disclaimer\Service\FrontendLock;
+use Lab09\Disclaimer\Service\ImportService;
 use Lab09\Disclaimer\Service\Installer;
 use Lab09\Disclaimer\Service\Migrator;
 use Lab09\Disclaimer\Service\RetentionService;
@@ -129,6 +136,28 @@ final class Services
         return new Installer($this->data, new SetupCode($this->data), $this->connect, $this->phpVersionId);
     }
 
+    public function frontendLock(): FrontendLock
+    {
+        return new FrontendLock(new SettingsRepository($this->pdo()), new AuditLogRepository($this->pdo()));
+    }
+
+    public function importService(): ImportService
+    {
+        $schema = new SchemaRepository($this->pdo());
+
+        return new ImportService(
+            $this->pdo(),
+            new ImportRepository($this->pdo()),
+            new VehicleRepository($this->pdo()),
+            new AuditLogRepository($this->pdo()),
+            ImportParser::fromFile(App::rootPath('config/import-mapping.php')),
+            DisclaimerBuilder::fromFile(App::rootPath('config/disclaimer-templates.php')),
+            $this->frontendLock(),
+            new BackupService($schema, $this->data),
+            $this->data,
+        );
+    }
+
     public function vehicleService(): VehicleService
     {
         return new VehicleService(
@@ -146,6 +175,18 @@ final class Services
 
     /** @param class-string<Controller> $class */
     public function controller(string $class): Controller
+    {
+        $controller = $this->makeController($class);
+        // Every admin page shows whether the public search is paused.
+        if ($controller instanceof AdminController) {
+            $controller->showLock($this->frontendLock()->status());
+        }
+
+        return $controller;
+    }
+
+    /** @param class-string<Controller> $class */
+    private function makeController(string $class): Controller
     {
         return match ($class) {
             HomeController::class => new HomeController($this->view, $this->search()),
@@ -190,6 +231,14 @@ final class Services
                 $this->session,
                 $this->updates(),
                 $this->vehicleService(),
+            ),
+            ImportController::class => new ImportController(
+                $this->view,
+                $this->auth(),
+                $this->csrf(),
+                $this->session,
+                new ImportRepository($this->pdo()),
+                $this->importService(),
             ),
             VehicleController::class => new VehicleController(
                 $this->view,

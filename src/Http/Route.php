@@ -20,6 +20,8 @@ final readonly class Route
         public string $action,
         public Access $access = Access::Admin,
         public ?int $rateLimitPerMinute = null,
+        public bool $lockable = false,
+        public ?int $maxBodyBytes = null,
     ) {
     }
 
@@ -38,7 +40,19 @@ final readonly class Route
     /** Requests per minute and (shortened) IP; more get 429 (API-7). */
     public function limit(int $perMinute): self
     {
-        return new self($this->method, $this->path, $this->controller, $this->action, $this->access, $perMinute);
+        return new self($this->method, $this->path, $this->controller, $this->action, $this->access, $perMinute, $this->lockable, $this->maxBodyBytes);
+    }
+
+    /** Part of the public search: shows the maintenance page while an import locks it. */
+    public function lockable(): self
+    {
+        return new self($this->method, $this->path, $this->controller, $this->action, $this->access, $this->rateLimitPerMinute, true, $this->maxBodyBytes);
+    }
+
+    /** A larger request body than the default 64 KB, e.g. for uploads (E-3). */
+    public function maxBody(int $bytes): self
+    {
+        return new self($this->method, $this->path, $this->controller, $this->action, $this->access, $this->rateLimitPerMinute, $this->lockable, $bytes);
     }
 
     /**

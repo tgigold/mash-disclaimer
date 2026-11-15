@@ -67,10 +67,6 @@ final readonly class Kernel
             return $redirect;
         }
 
-        if ($request->contentLength() > self::MAX_BODY_BYTES) {
-            return $this->errorPage(413, 'Request too large', 'The request is larger than this form allows.');
-        }
-
         $match = $this->router->match($request->method, $request->path);
 
         if ($match->allowedMethods !== []) {
@@ -83,6 +79,19 @@ final readonly class Kernel
             return str_starts_with($request->path, '/api/')
                 ? ApiController::error(404, 'not_found', 'Unknown endpoint.')
                 : $this->notFound();
+        }
+
+        if ($request->contentLength() > ($route->maxBodyBytes ?? self::MAX_BODY_BYTES)) {
+            return $this->errorPage(413, 'Request too large', 'The request is larger than this form allows.');
+        }
+
+        // During an import the public search shows a maintenance page, so
+        // nobody copies a disclaimer that is about to change.
+        if ($route->lockable && $this->services->config->isInstalled()) {
+            $lock = $this->services->frontendLock()->status();
+            if ($lock !== null) {
+                return $this->maintenance($request, $lock['since']);
+            }
         }
 
         // A-3: everything not marked public needs a signed-in admin. Checked on
@@ -171,6 +180,17 @@ final readonly class Kernel
         $query = $request->query === [] ? '' : '?' . http_build_query($request->query, '', '&', PHP_QUERY_RFC3986);
 
         return Response::redirect($baseUrl . $request->path . $query, 301);
+    }
+
+    private function maintenance(Request $request, \DateTimeImmutable $since): Response
+    {
+        if (str_starts_with($request->path, '/api/')) {
+            return ApiController::error(503, 'maintenance', 'The data is being updated. Please try again in a few minutes.')
+                ->withHeader('Retry-After', '300');
+        }
+
+        return new Response($this->services->view->page('maintenance', ['title' => 'Updating', 'since' => $since]), 503)
+            ->withHeader('Retry-After', '300');
     }
 
     private function notFound(): Response

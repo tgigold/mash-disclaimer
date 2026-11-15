@@ -15,6 +15,7 @@ final readonly class Request
      * @param array<string, mixed> $body Parsed POST body, types untouched so
      *                                   validation can reject arrays (E-2)
      * @param array<string, string> $cookies
+     * @param array<string, UploadedFile> $files only single, well-formed uploads
      */
     public function __construct(
         public string $method,
@@ -23,6 +24,7 @@ final readonly class Request
         public array $server = [],
         public array $body = [],
         public array $cookies = [],
+        public array $files = [],
     ) {
     }
 
@@ -41,6 +43,7 @@ final readonly class Request
             self::strings($_SERVER),
             $body,
             self::strings($_COOKIE),
+            UploadedFile::fromGlobals($_FILES),
         );
     }
 

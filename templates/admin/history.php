@@ -28,6 +28,12 @@ $labels = [
     'vehicle.reset' => 'Reset to factory values',
     'vehicle.deleted' => 'Deleted vehicle',
     'texts.regenerated' => 'Regenerated live texts',
+    'import.uploaded' => 'Uploaded import file',
+    'import.started' => 'Started import',
+    'import.applied' => 'Applied import',
+    'import.aborted' => 'Aborted import',
+    'frontend.locked' => 'Paused the public search',
+    'frontend.released' => 'Released the public search',
 ];
 
 $describe = static function (array $details): string {

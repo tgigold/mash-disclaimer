@@ -4,6 +4,20 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 
 ## [Unreleased]
 
+### Hinzugefügt
+
+- Fahrzeugverwaltung unter Admin → Vehicles: Liste mit Kennzahlen, Filtern nach Typ, Status und Herkunft und Suche; Seitenleiste zum Bearbeiten mit Vorschau des Disclaimers beim Tippen.
+- Fahrzeuge live stellen, aus der Suche nehmen, löschen; bearbeitete Live-Werte importierter Fahrzeuge sind markiert und lassen sich auf die Werksangaben zurücksetzen, der eigene Name bleibt.
+- Fahrzeuge von Hand anlegen („New vehicle“), mit Werten direkt aus Excel (`19.5 / 17.2`, auch mit Dezimalkomma).
+- Normalisierung der Werte nach den Regeln der Fachlogik (höherer Wert zuerst, identische Paare zusammengefasst, Kilometer ganzzahlig, CO₂-Klassen sortiert) – dieselbe Klasse nutzt später der Import.
+- „Regenerate texts“ unter Updates baut alle Live-Texte nach einer Vorlagenänderung neu.
+- Kommandozeile: `user:create` als Notzugang.
+- Browser-Tests für die Seitenleiste.
+
+### Behoben
+
+- Vor dem Setup verglich die Origin-Prüfung den Host samt Port; Formulare auf Adressen mit Port (z. B. `localhost:8080`) wären abgelehnt worden.
+
 ## [4.3.0] – 2026-11-15
 
 ### Hinzugefügt

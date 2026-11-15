@@ -36,5 +36,7 @@ declare(strict_types=1);
 
 <section class="admin-card">
     <h2>Vehicles</h2>
-    <p class="text-body-secondary mb-0">The vehicle list with editing, going live and resetting comes in the next update.</p>
+    <p>Edit names and values, put vehicles live or withdraw them, reset edited values to the factory values.</p>
+    <a class="btn btn-primary" href="/admin/vehicles">Open vehicles</a>
+    <a class="btn btn-outline-secondary" href="/admin/vehicles/new">New vehicle</a>
 </section>

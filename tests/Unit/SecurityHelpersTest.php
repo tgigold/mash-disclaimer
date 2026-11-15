@@ -64,5 +64,9 @@ final class SecurityHelpersTest extends TestCase
         self::assertTrue(Csrf::isSameOrigin($request, null), 'Before setup the Host header is the reference.');
         self::assertTrue(Csrf::isSameOrigin(new Request('POST', '/', server: ['HTTP_SEC_FETCH_SITE' => 'none']), null));
         self::assertFalse(Csrf::isSameOrigin(new Request('POST', '/', server: ['HTTP_SEC_FETCH_SITE' => 'same-site']), null));
+        self::assertTrue(
+            Csrf::isSameOrigin(new Request('POST', '/', server: ['HTTP_HOST' => 'localhost:8080', 'HTTP_ORIGIN' => 'http://localhost:8080']), null),
+            'A port in the Host header does not matter.',
+        );
     }
 }

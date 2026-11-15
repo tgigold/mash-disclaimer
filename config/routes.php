@@ -12,6 +12,7 @@ use Lab09\Disclaimer\Controller\Admin\DashboardController;
 use Lab09\Disclaimer\Controller\Admin\HistoryController;
 use Lab09\Disclaimer\Controller\Admin\UpdateController;
 use Lab09\Disclaimer\Controller\Admin\UserController;
+use Lab09\Disclaimer\Controller\Admin\VehicleController;
 use Lab09\Disclaimer\Controller\ApiController;
 use Lab09\Disclaimer\Controller\HealthController;
 use Lab09\Disclaimer\Controller\HomeController;
@@ -43,6 +44,16 @@ return [
     // Admin area – no Access::Public, so every route needs a signed-in admin (A-3).
     Route::post('/logout', LoginController::class, 'logout'),
     Route::get('/admin', DashboardController::class, 'index'),
+    Route::get('/admin/vehicles', VehicleController::class, 'index'),
+    Route::get('/admin/vehicles/new', VehicleController::class, 'newForm'),
+    Route::post('/admin/vehicles', VehicleController::class, 'create'),
+    Route::post('/admin/vehicles/preview', VehicleController::class, 'preview'),
+    Route::get('/admin/vehicles/{id}', VehicleController::class, 'show'),
+    Route::post('/admin/vehicles/{id}', VehicleController::class, 'save'),
+    Route::post('/admin/vehicles/{id}/live', VehicleController::class, 'live'),
+    Route::post('/admin/vehicles/{id}/withdraw', VehicleController::class, 'withdraw'),
+    Route::post('/admin/vehicles/{id}/reset', VehicleController::class, 'reset'),
+    Route::post('/admin/vehicles/{id}/delete', VehicleController::class, 'delete'),
     Route::get('/admin/users', UserController::class, 'index'),
     Route::post('/admin/users', UserController::class, 'create'),
     Route::post('/admin/users/{id}/password', UserController::class, 'password'),
@@ -51,6 +62,7 @@ return [
     Route::get('/admin/history', HistoryController::class, 'index'),
     Route::get('/admin/updates', UpdateController::class, 'index'),
     Route::post('/admin/updates', UpdateController::class, 'migrate'),
+    Route::post('/admin/updates/regenerate', UpdateController::class, 'regenerate'),
     Route::get('/admin/account', AccountController::class, 'index'),
     Route::post('/admin/account/password', AccountController::class, 'password'),
     Route::get('/admin/account/export', AccountController::class, 'export'),

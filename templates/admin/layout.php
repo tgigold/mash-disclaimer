@@ -19,6 +19,7 @@ use Lab09\Disclaimer\Security\Csrf;
 
 $nav = [
     'dashboard' => ['/admin', 'Dashboard', 'bi-grid'],
+    'vehicles' => ['/admin/vehicles', 'Vehicles', 'bi-car-front'],
     'users' => ['/admin/users', 'Users', 'bi-people'],
     'history' => ['/admin/history', 'Change history', 'bi-clock-history'],
     'updates' => ['/admin/updates', 'Updates', 'bi-arrow-repeat'],
@@ -63,6 +64,7 @@ $nav = [
         <?= $content ?>
     </main>
 
+    <script src="<?= e(\Lab09\Disclaimer\Support\Assets::url('js/admin-vehicles.js')) ?>" defer></script>
     <footer class="site-footer">
         <nav aria-label="Footer">
             <a href="/">Search</a>

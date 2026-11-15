@@ -12,6 +12,8 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 - Aufbewahrungsfristen: Login-Fehlversuche 15 Minuten, bekannte Geräte 1 Jahr, gekürzte IPs im Audit-Log 90 Tage, Audit-Log 24 Monate.
 - Migration `0002`: Tabellen für Login-Fehlversuche und bekannte Geräte.
 
+## [4.2.0] – 2026-11-15
+
 ### Hinzugefügt
 
 - Öffentliche Suche auf der Startseite: Vorschläge beim Tippen, Tastaturbedienung (Pfeile, Enter, Esc), Treffer ohne Seitenwechsel, Trefferliste bei mehreren Fahrzeugen, „No match“, Copy-Button mit Rückmeldung; funktioniert auch ohne JavaScript als GET-Formular.
@@ -58,6 +60,7 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 - Jede Anfrage endete mit `403`: Die sperrende `.htaccess` im Projektverzeichnis galt auch für `public/`, weil Apache die `.htaccess` der Elternverzeichnisse mit auswertet. Gesperrt sind jetzt nur die Verzeichnisse neben `public/`.
 - Der Deploy bricht ab, bevor etwas übertragen wird, wenn ein Secret fehlt oder `DEPLOY_PATH` kein tiefer absoluter Pfad ist; ein leerer Pfad hätte rsync mit `--delete` auf `/` zielen lassen.
 
-[Unreleased]: https://github.com/tgigold/mash-disclaimer/compare/v4.1.0...HEAD
+[Unreleased]: https://github.com/tgigold/mash-disclaimer/compare/v4.2.0...HEAD
+[4.2.0]: https://github.com/tgigold/mash-disclaimer/releases/tag/v4.2.0
 [4.1.0]: https://github.com/tgigold/mash-disclaimer/releases/tag/v4.1.0
 [4.0.0]: https://github.com/tgigold/mash-disclaimer/releases/tag/v4.0.0

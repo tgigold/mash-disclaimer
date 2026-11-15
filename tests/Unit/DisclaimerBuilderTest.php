@@ -47,11 +47,11 @@ final class DisclaimerBuilderTest extends TestCase
             "BMW X5 xDrive50e. Mandatory information according to German law 'Pkw-EnVKV' based on WLTP: "
             . 'energy consumption weighted combined: 27.8-25.1 kWh/100 km and 4.7 l/100 km; '
             . 'CO₂ emissions weighted combined: 32-22 g/km; CO₂ classes: with discharged battery: G-F; weighted combined: B; '
-            . 'Fuel consumption with depleted battery combined: 11.3 l/100km; electric range: 96-87 km.',
+            . 'Fuel consumption with depleted battery combined: 11.3 l/100km; electric range: 87-96 km.',
             $this->builder->build(Drivetrain::PHEV, 'BMW X5 xDrive50e', [
                 'electric_consumption' => '27.8-25.1', 'fuel_consumption' => '4.7', 'co2_emissions' => '32-22',
                 'co2_class' => 'B', 'co2_class_discharged' => 'G-F', 'fuel_consumption_discharged' => '11.3',
-                'electric_range' => '96-87',
+                'electric_range' => '87-96',
             ]),
         );
     }
@@ -60,9 +60,9 @@ final class DisclaimerBuilderTest extends TestCase
     {
         self::assertSame(
             'BMW i5 eDrive40 Sedan. Mandatory information according to German law \'Pkw-EnVKV\' based on WLTP: energy consumption combined: 18.9-15.9 kWh/100 km; '
-            . 'CO₂ emissions combined: 0 g/km; CO₂ class: A; electric range: 582-497 km.',
+            . 'CO₂ emissions combined: 0 g/km; CO₂ class: A; electric range: 497-582 km.',
             $this->builder->build(Drivetrain::BEV, 'BMW i5 eDrive40 Sedan', [
-                'electric_consumption' => '18.9-15.9', 'co2_class' => 'A', 'electric_range' => '582-497',
+                'electric_consumption' => '18.9-15.9', 'co2_class' => 'A', 'electric_range' => '497-582',
             ]),
         );
     }

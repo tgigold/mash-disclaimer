@@ -39,20 +39,20 @@ final readonly class SampleData
             [
                 'electric_consumption' => '27.8-25.1', 'fuel_consumption' => '1.4-1.0', 'co2_emissions' => '32-22',
                 'co2_class' => 'B', 'co2_class_discharged' => 'G-F', 'fuel_consumption_discharged' => '10.0-9.4',
-                'electric_range' => '96-87',
+                'electric_range' => '87-96',
             ], true],
         ['Z0006', Brand::BMW, 'G20', Drivetrain::PHEV, 'BMW 330e Sedan',
             [
                 'electric_consumption' => '17.9-16.2', 'fuel_consumption' => '1.0-0.8', 'co2_emissions' => '23-18',
                 'co2_class' => 'B', 'co2_class_discharged' => 'E-D', 'fuel_consumption_discharged' => '6.2-5.8',
-                'electric_range' => '101-91',
+                'electric_range' => '91-101',
             ], true],
         ['Z0007', Brand::BMW, 'G60', Drivetrain::BEV, 'BMW i5 eDrive40 Sedan',
-            ['electric_consumption' => '18.9-15.9', 'co2_class' => 'A', 'electric_range' => '582-497'], true],
+            ['electric_consumption' => '18.9-15.9', 'co2_class' => 'A', 'electric_range' => '497-582'], true],
         ['Z0008', Brand::BMW, 'I20', Drivetrain::BEV, 'BMW iX xDrive60',
-            ['electric_consumption' => '20.6-17.8', 'co2_class' => 'A', 'electric_range' => '701-596'], true],
+            ['electric_consumption' => '20.6-17.8', 'co2_class' => 'A', 'electric_range' => '596-701'], true],
         ['Z0009', Brand::MINI, 'J01', Drivetrain::BEV, 'MINI Cooper SE',
-            ['electric_consumption' => '15.2-14.3', 'co2_class' => 'A', 'electric_range' => '402-376'], true],
+            ['electric_consumption' => '15.2-14.3', 'co2_class' => 'A', 'electric_range' => '376-402'], true],
     ];
 
     public function __construct(

@@ -44,7 +44,7 @@ final class MigratorTest extends DatabaseTestCase
     {
         $applied = $this->migrator()->migrate();
 
-        self::assertSame(['0001_initial_schema', '0002_login_protection', '0003_imports'], $applied);
+        self::assertSame(['0001_initial_schema', '0002_login_protection', '0003_imports', '0004_range_low_first'], $applied);
         // The collation may sort "v4_imports" before "v4_import_items"; the order does not matter.
         self::assertEqualsCanonicalizing(
             ['v4_audit_log', 'v4_import_items', 'v4_imports', 'v4_known_devices', 'v4_login_attempts', 'v4_migrations', 'v4_settings', 'v4_users', 'v4_vehicles', 'v4_vehicles_live'],
@@ -69,12 +69,38 @@ final class MigratorTest extends DatabaseTestCase
         }
     }
 
+    public function testRangesAreFlippedToLowFirstWithTheirLiveText(): void
+    {
+        $this->migrator()->migrate();
+        $this->pdo->exec("INSERT INTO v4_vehicles (id, origin, brand, drivetrain, name, electric_consumption, co2_class, electric_range, created_at) VALUES
+            ('RNGE0001', 'import', 'BMW', 'BEV', 'i5', '20.1', 'A', '456-455', UTC_TIMESTAMP()),
+            ('RNGE0002', 'import', 'BMW', 'BEV', 'i4', '16.1', 'A', '480-520', UTC_TIMESTAMP()),
+            ('RNGE0003', 'import', 'BMW', 'PHEV', 'X5', '25.4-24.1', 'C', '80', UTC_TIMESTAMP())");
+        $this->pdo->exec("INSERT INTO v4_vehicles_live (vehicle_id, electric_consumption, co2_class, electric_range, disclaimer_text, activated_at) VALUES
+            ('RNGE0001', '20.1', 'A', '456-455', 'i5. CO₂ class: A; WLTP electric range: 456-455 km.', UTC_TIMESTAMP())");
+
+        $migration = require App::rootPath('migrations/0004_range_low_first.php');
+        $migration->up($this->pdo);
+        $migration->up($this->pdo); // a second run changes nothing
+
+        $vehicles = $this->pdo->query('SELECT id, electric_range, electric_consumption FROM v4_vehicles ORDER BY id');
+        $live = $this->pdo->query("SELECT electric_range, disclaimer_text FROM v4_vehicles_live WHERE vehicle_id = 'RNGE0001'");
+        self::assertNotFalse($vehicles);
+        self::assertNotFalse($live);
+        $ranges = $vehicles->fetchAll(\PDO::FETCH_NUM);
+        self::assertSame([['RNGE0001', '455-456', '20.1'], ['RNGE0002', '480-520', '16.1'], ['RNGE0003', '80', '25.4-24.1']], $ranges);
+        self::assertSame(
+            ['455-456', 'i5. CO₂ class: A; WLTP electric range: 455-456 km.'],
+            $live->fetch(\PDO::FETCH_NUM),
+        );
+    }
+
     public function testSecondRunDoesNothing(): void
     {
         $this->migrator()->migrate();
 
         self::assertSame([], $this->migrator()->migrate());
-        self::assertSame(3, $this->countRows('SELECT COUNT(*) FROM v4_migrations'));
+        self::assertSame(4, $this->countRows('SELECT COUNT(*) FROM v4_migrations'));
     }
 
     public function testBackupIsWrittenBeforeANewMigration(): void

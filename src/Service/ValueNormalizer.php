@@ -9,7 +9,7 @@ use Lab09\Disclaimer\Domain\VehicleField;
 /**
  * Turns a value as it comes from the manufacturer's file or from a form into
  * the stored form (docs/fachlogik.md, section 2 "Normalisierung"):
- * "10.2 / 9.4 (10.2 / 9.5)" → "10.2-9.4", "729.0 / 911.0" → "911-729",
+ * "10.2 / 9.4 (10.2 / 9.5)" → "10.2-9.4", ranges low to high "911.0 / 729.0" → "729-911",
  * "10.4 / 10.4" → "10.4", "D-E" → "E-D". Numbers are compared, never
  * calculated or rounded; the text is kept as given. The import (step 6) uses
  * the same class, so form and import can never disagree.
@@ -30,8 +30,8 @@ final class ValueNormalizer
 
         return match ($field->kind()) {
             'class' => self::co2Class($value),
-            'km' => self::numbers($value, wholeNumbers: true),
-            default => self::numbers($value, wholeNumbers: false),
+            'km' => self::numbers($value, kilometres: true),
+            default => self::numbers($value, kilometres: false),
         };
     }
 
@@ -44,7 +44,7 @@ final class ValueNormalizer
         return trim((string) preg_replace('/\s*\(.*\)$/u', '', $value));
     }
 
-    private static function numbers(string $value, bool $wholeNumbers): string
+    private static function numbers(string $value, bool $kilometres): string
     {
         // A German Excel copies decimals with a comma; "10,4" means 10.4.
         $value = (string) preg_replace('/(\d),(\d)/', '$1.$2', $value);
@@ -56,7 +56,7 @@ final class ValueNormalizer
         $first = $m[1];
         $second = $m[2] ?? null;
 
-        if ($wholeNumbers) {
+        if ($kilometres) {
             $first = self::wholeKilometres($first);
             $second = $second === null ? null : self::wholeKilometres($second);
         }
@@ -65,7 +65,10 @@ final class ValueNormalizer
             return $first;
         }
 
-        return (float) $first > (float) $second ? $first . '-' . $second : $second . '-' . $first;
+        // Higher value first; only kilometres (the range) go from low to high.
+        $higherFirst = (float) $first > (float) $second;
+
+        return $higherFirst !== $kilometres ? $first . '-' . $second : $second . '-' . $first;
     }
 
     private static function wholeKilometres(string $number): string

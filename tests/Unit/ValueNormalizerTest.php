@@ -31,7 +31,7 @@ final class ValueNormalizerTest extends TestCase
         yield 'numeric, not text comparison' => [VehicleField::FuelConsumption, '9.9 / 10.1', '10.1-9.9'];
         yield 'equal by value' => [VehicleField::FuelConsumption, '10 / 10.0', '10'];
         yield 'German decimal comma' => [VehicleField::FuelConsumption, '10,4 / 9,8', '10.4-9.8'];
-        yield 'range: higher first, .0 dropped' => [VehicleField::ElectricRange, '729.0 / 911.0', '911-729'];
+        yield 'range: low to high, .0 dropped' => [VehicleField::ElectricRange, '729.0 / 911.0', '729-911'];
         yield 'range: single' => [VehicleField::ElectricRange, '911.0', '911'];
         yield 'range: identical' => [VehicleField::ElectricRange, '96.0 / 96.0', '96'];
         yield 'class single' => [VehicleField::Co2Class, 'G', 'G'];

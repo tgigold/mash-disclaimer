@@ -159,7 +159,7 @@ final class ImportTest extends DatabaseTestCase
         $i3Vehicle = $this->vehicles->find($i3);
         self::assertNotNull($i3Vehicle);
         self::assertSame('BMW i3 50 xDrive Limousine 4-türig, NA0', $i3Vehicle->name, 'First import: name from the file.');
-        self::assertSame('911-729', $i3Vehicle->values['electric_range']);
+        self::assertSame('729-911', $i3Vehicle->values['electric_range']);
 
         self::assertNull($this->vehicles->find('GPNE0001'), 'Missing vehicle deleted as chosen.');
 

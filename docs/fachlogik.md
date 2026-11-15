@@ -96,7 +96,7 @@ Eine Vorlage je Typ mit Platzhaltern, gepflegt in der Pflege-Datei `config/discl
 
 - **ICE** und **MHEV** `{name}. Mandatory information according to German law 'Pkw-EnVKV' based on WLTP: energy consumption combined: {fuel_consumption} l/100 km; CO₂ emissions combined: {co2_emissions} g/km; CO₂ class(es): {co2_class}.`
 - **PHEV** `{name}. Mandatory information according to German law 'Pkw-EnVKV' based on WLTP: energy consumption weighted combined: {electric_consumption} kWh/100 km and {fuel_consumption} l/100 km; CO₂ emissions weighted combined: {co2_emissions} g/km; CO₂ classes: with discharged battery: {co2_class_discharged}; weighted combined: {co2_class}; Fuel consumption with depleted battery combined: {fuel_consumption_discharged} l/100km; electric range: {electric_range} km.`
-- **BEV** `{name}. WLTP energy consumption combined: {electric_consumption} kWh/100 km; WLTP CO₂ emissions combined: 0 g/km; CO₂ class: {co2_class}; WLTP electric range: {electric_range} km.`
+- **BEV** `{name}. Mandatory information according to German law 'Pkw-EnVKV' based on WLTP: energy consumption combined: {electric_consumption} kWh/100 km; CO₂ emissions combined: 0 g/km; CO₂ class: {co2_class}; electric range: {electric_range} km.`
 
 Der Text wird **immer** aus Vorlage, Name und Werten erzeugt und nie frei überschrieben. Bearbeitbar sind nur Name und Werte. Der fertige Text liegt trotzdem in der Live-Tabelle (die Suche liest nur). Ändert sich eine Vorlage, erzeugt eine Admin-Aktion „Regenerate texts“ alle Live-Texte neu.
 

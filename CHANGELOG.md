@@ -16,6 +16,7 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 
 ### Geändert
 
+- BEV-Disclaimer folgt jetzt demselben Aufbau wie die übrigen Typen: „Mandatory information according to German law 'Pkw-EnVKV' based on WLTP: energy consumption combined: … kWh/100 km; CO₂ emissions combined: 0 g/km; CO₂ class: …; electric range: … km.“ Bestehende Live-Texte werden mit „Regenerate texts“ unter Change history → Updates neu erzeugt.
 - Fahrzeug-Adressen sind nur noch `/vehicles/{id}`, ohne Namensanhang; ein Umbenennen ändert die Adresse nicht mehr. Alte Adressen mit Anhang leiten per 301 um.
 - Einheitliche Rundungen: Buttons, Eingabefelder und Boxen haben denselben Radius. Ganz rund sind nur noch Labels (Typ, Status, Hinweise), damit nichts Rundes anklickbar wirkt.
 - Updates sind aus der Hauptnavigation auf die Seite Change history gewandert.

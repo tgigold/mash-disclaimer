@@ -25,7 +25,8 @@ return [
         . 'Fuel consumption with depleted battery combined: {fuel_consumption_discharged} l/100km; '
         . 'electric range: {electric_range} km.',
 
-    'BEV' => '{name}. WLTP energy consumption combined: {electric_consumption} kWh/100 km; '
-        . 'WLTP CO₂ emissions combined: 0 g/km; CO₂ class: {co2_class}; '
-        . 'WLTP electric range: {electric_range} km.',
+    'BEV' => "{name}. Mandatory information according to German law 'Pkw-EnVKV' based on WLTP: "
+        . 'energy consumption combined: {electric_consumption} kWh/100 km; '
+        . 'CO₂ emissions combined: 0 g/km; CO₂ class: {co2_class}; '
+        . 'electric range: {electric_range} km.',
 ];

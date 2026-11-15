@@ -9,7 +9,7 @@ V4 löst die bisherige Version 3 ab. In der Entwicklung läuft sie unter <https:
 | | |
 |---|---|
 | **Zweck** | Verbrauchswerte von BMW-Group-Fahrzeugen verwalten und EnVKV-Disclaimer zum Kopieren bereitstellen |
-| **Abhängigkeiten** | mit Composer · Laufzeit: `phpoffice/phpspreadsheet` zum Lesen der XLSX (kommt mit dem Import-Schritt) · Entwicklung: PHPUnit, PHPStan |
+| **Abhängigkeiten** | mit Composer · Laufzeit: `phpoffice/phpspreadsheet` zum Lesen der XLSX · Entwicklung: PHPUnit, PHPStan · Browser-Tests mit Python 3 und Chrome, ohne Pakete |
 | **Frontend** | Bootstrap 5.3 + Bootstrap Icons, lokal · Schrift: Bricolage Grotesque (woff2, lokal, aus `@fontsource/bricolage-grotesque`) · JavaScript: ja, für Autovervollständigung, Copy, Theme-Umschalter, Admin-Liste · kein Build-Schritt |
 | **Datenbank** | MySQL/MariaDB, Tabellenpräfix `v4_`, eigener Datenbanknutzer |
 | **Zugang** | gemischt: Suche öffentlich, Admin hinter Login (mehrere Nutzer, eine Rolle; jeder Admin kann weitere anlegen) · API: nur intern für die Autovervollständigung, öffentlich lesend |
@@ -51,7 +51,7 @@ Jeder Schritt ist ein Pull Request mit Tests, CHANGELOG und README-Pflege; jedes
 | 3 | Öffentliche Suche | Autovervollständigung, Treffer, Copy auf Fake-Daten | 4.2.0 |
 | 4 | Login, Nutzerverwaltung, Audit-Log | Admin-Bereich erreichbar und abgesichert | 4.3.0 |
 | 5 | Fahrzeugverwaltung | Liste, live/zurückziehen, bearbeiten, zurücksetzen, von Hand anlegen, Textgenerator | 4.4.0 |
-| 6 | Import | Upload, Einlesen, Prüfschritt, Übernehmen, Frontend-Sperre | |
+| 6 | Import | Upload, Einlesen, Prüfschritt, Übernehmen, Frontend-Sperre | in Arbeit |
 | 7 | Ablösung V3 | Umzug auf `disclaimer.lab09.de`, V3 abschalten | |
 
 **Später:** Rollen, Passwort-Reset per E-Mail, Zwei-Faktor-Anmeldung (`S-29`, `S-38`); MINI und BMW ALPINA, sobald deren Dateien vorliegen.
@@ -99,6 +99,7 @@ Unter `/admin`, erreichbar über „Dashboard“ in der Fußzeile. Jede Seite do
 |---|---|
 | Dashboard | Kennzahlen (Fahrzeuge, live, Entwürfe, aktive Admins), Hinweis auf ausstehende Updates |
 | Vehicles | Liste aller Fahrzeuge mit Filtern und Seitenleiste zum Bearbeiten, siehe unten |
+| Import | Hersteller-XLSX hochladen, prüfen, übernehmen, siehe unten |
 | Users | Admins anlegen, neues Passwort setzen, deaktivieren und reaktivieren. Jede Aktion fragt das eigene Passwort ab (`S-35`). Das letzte aktive Konto lässt sich nicht deaktivieren. |
 | Change history | das Audit-Log, neueste zuerst, 50 je Seite |
 | Updates | ausstehende Datenbank-Migrationen ansehen und mit Backup ausführen (`G-12`); „Regenerate texts“ nach einer Änderung der Disclaimer-Vorlagen |
@@ -113,6 +114,25 @@ Unter `/admin`, erreichbar über „Dashboard“ in der Fußzeile. Jede Seite do
 - **Von Hand angelegte Fahrzeuge** („New vehicle“): Name, Marke, Typ und Werte sind Pflicht, Typschlüssel und Reihe optional. Sie starten als Entwurf. Ein Typschlüssel darf nur einmal vorkommen.
 - **Put live / Withdraw** stellen ein Fahrzeug in die Suche oder nehmen es heraus. **Delete** löscht es; ein importiertes Fahrzeug bietet der nächste Import dann wieder als neu an.
 - Jede Aktion steht im Audit-Log.
+
+**Import**
+
+Die XLSX des Herstellers kommt in vier Schritten ins Tool. Wie die Datei gelesen wird, beschreibt `docs/fachlogik.md`; was wo in der Datei steht, regelt die Pflege-Datei `config/import-mapping.php`.
+
+1. **Hochladen** (höchstens 5 MB) oder eine früher hochgeladene Datei erneut verwenden. Geprüft wird der Inhalt (Typ und ZIP-Struktur), nicht die Endung. Die Datei liegt mit zufälligem Namen in `data/uploads/` und lässt sich als `[Originalname]-[Uploaddatum].xlsx` wieder herunterladen. **Ab hier ist die öffentliche Suche pausiert:** Sie zeigt eine Wartungsseite, die API antwortet mit `503`. Öffentlich steht nur, seit wann pausiert ist, nicht von wem.
+2. **Prüfen:** Jeder Typschlüssel landet in der Staging-Tabelle und wird mit dem Bestand verglichen. Die Seite zeigt:
+   - **neue** Typschlüssel, je mit „importieren“;
+   - **geänderte**, mit alt → neu je Feld und dem Hinweis auf bearbeitete Live-Werte;
+   - **unveränderte**;
+   - **entfallene**, also im Bestand, aber nicht in der Datei, geprüft nur für die Marken in der Datei; je Fahrzeug behalten oder löschen;
+   - **Problemfälle** wie `N/A` in einem Pflichtfeld, unerkannter Typ, fehlender Marker oder doppelter Typschlüssel. Sie werden nie automatisch übernommen; ein neuer lässt sich als Entwurf übernehmen;
+   - **von Hand angelegte Fahrzeuge**: behalten, mit einem neuen Typschlüssel zusammenführen (der eigene Name bleibt) oder löschen.
+
+   Außerdem legt man fest, was **live** geht: nur die derzeit live geschalteten, alle aus der Datei oder nur die angehakten.
+3. **Übernehmen:** Erst entsteht ein Backup, dann läuft alles in einer Transaktion. Eigene Namen bleiben immer erhalten, bearbeitete Live-Werte werden durch die neuen Werksangaben ersetzt. „Abort“ verwirft den Import bis hierhin, ohne etwas zu ändern.
+4. **Freigeben:** Die Suche bleibt pausiert, bis ein Admin oben im Banner „Release search“ wählt. Jeder Admin kann das, auch für einen Import, den jemand anders begonnen hat. Alles steht im Audit-Log.
+
+Gegen die echte Datei vom September 2026 liest der Import 152 Typschlüssel in 30 Tabs: 34 ICE, 69 MHEV, 21 PHEV, 28 BEV, ohne Problemfälle. Er braucht dafür etwa eine halbe Sekunde und 42 MB Speicher.
 
 **Anmeldung und Sitzungen**
 
@@ -132,6 +152,7 @@ Unter `/admin`, erreichbar über „Dashboard“ in der Fußzeile. Jede Seite do
 | gekürzte IPs im Audit-Log | 90 Tage |
 | Einträge im Audit-Log | 24 Monate |
 | Fehler-Log | Größe begrenzt auf 2 × 1 MB |
+| hochgeladene XLSX in `data/uploads/` | unbegrenzt, als Nachweis; keine personenbezogenen Daten |
 
 ## API
 

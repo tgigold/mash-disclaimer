@@ -38,7 +38,7 @@ Geprüft an `20261008_WLTP_BMW_DE_2026_11_12_2027_01_V3.xlsx` (vollständig eing
 
 **Werte**
 
-- Alle Zellen sind Text. Formate in den Pflichtspalten: `237 / 235`, `10.4 / 10.4`, `425.0 / 425.0`, `N/A`, Klassen `G` oder `E-D`.
+- Die Werte stehen als Text in den Zellen. Ausnahme: Die Zeilen `CO2-Klasse` und `CO2-Klasse bei entladener Batterie (PHEV)` sind **Formeln** (680 Zellen); der Import liest das Ergebnis, das Excel gespeichert hat, und rechnet nie selbst nach. In der Datei vom September 2026 hat jede Formelzelle ein gespeichertes Ergebnis. Formate in den Pflichtspalten: `237 / 235`, `10.4 / 10.4`, `425.0 / 425.0`, `N/A`, Klassen `G` oder `E-D`.
 - Werte mit Klammerzusatz kommen auch in Pflichtspalten vor (z. B. `NA0`/`51JB`: `18.0 / 13.4 (16.1 / 13.5)`). Der Fall `N/A (158.0 / 148.0)` kommt in dieser Datei in den benötigten Feldern nicht vor, muss aber behandelt werden.
 - Reichweiten stehen als `729.0 / 911.0` – also niedriger Wert zuerst und mit `.0`.
 - Viele Paare sind identisch (`10.4 / 10.4`).

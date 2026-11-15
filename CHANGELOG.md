@@ -4,6 +4,15 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 
 ## [Unreleased]
 
+### Hinzugefügt
+
+- Import der Hersteller-XLSX unter Admin → Import: Upload (oder erneute Verwendung einer früheren Datei), Prüfschritt mit neuen, geänderten, unveränderten, entfallenen und Problem-Fahrzeugen, Zusammenführen von Hand angelegter Fahrzeuge, Wahl der Live-Fahrzeuge, Übernahme in einer Transaktion nach Backup, Abbruch.
+- Pause der öffentlichen Suche ab Importstart mit Wartungsseite und `503` in der API; Freigabe von Hand per Banner im Admin-Bereich.
+- Pflege-Datei `config/import-mapping.php` für die Bezeichnungen in der XLSX, die Typ-Erkennung und die Marken.
+- Download der Originaldatei als `[Originalname]-[Uploaddatum].xlsx`.
+- Migration `0003`: Importe und Staging-Tabelle.
+- `phpoffice/phpspreadsheet` als Laufzeit-Abhängigkeit; das Setup prüft zusätzlich `intl`, `zip`, `xmlreader`, `gd` und `fileinfo`.
+
 ## [4.4.0] – 2026-11-15
 
 ### Hinzugefügt

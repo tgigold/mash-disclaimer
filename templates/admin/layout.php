@@ -14,12 +14,14 @@ use Lab09\Disclaimer\Security\Csrf;
  * @var \Lab09\Disclaimer\Domain\User $actor
  * @var string $csrfToken
  * @var string|null $flash
+ * @var array{since: \DateTimeImmutable, by: string|null, import_id: int|null}|null $lock
  * @var \Lab09\Disclaimer\Support\View $view
  */
 
 $nav = [
     'dashboard' => ['/admin', 'Dashboard', 'bi-grid'],
     'vehicles' => ['/admin/vehicles', 'Vehicles', 'bi-car-front'],
+    'import' => ['/admin/import', 'Import', 'bi-file-earmark-arrow-up'],
     'users' => ['/admin/users', 'Users', 'bi-people'],
     'history' => ['/admin/history', 'Change history', 'bi-clock-history'],
     'updates' => ['/admin/updates', 'Updates', 'bi-arrow-repeat'],
@@ -55,6 +57,20 @@ $nav = [
             </button>
         </div>
     </header>
+
+<?php if ($lock !== null): ?>
+    <div class="lock-banner" role="status">
+        <i class="bi bi-pause-circle" aria-hidden="true"></i>
+        <span>The public search is paused since <?= e($lock['since']->format('j M Y, H:i')) ?> UTC<?= $lock['by'] !== null ? ' (started by ' . e($lock['by']) . ')' : '' ?>.</span>
+<?php if ($lock['import_id'] !== null): ?>
+        <a href="/admin/import/<?= e($lock['import_id']) ?>">Open import</a>
+<?php endif ?>
+        <form method="post" action="/admin/frontend/release">
+            <input type="hidden" name="<?= e(Csrf::FIELD) ?>" value="<?= e($csrfToken) ?>">
+            <button class="btn btn-sm btn-primary" type="submit">Release search</button>
+        </form>
+    </div>
+<?php endif ?>
 
     <main class="admin-main">
         <h1 class="admin-title"><?= e($title) ?></h1>

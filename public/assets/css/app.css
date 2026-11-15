@@ -550,6 +550,254 @@ body {
     font-weight: 600;
 }
 
+.panel-narrow {
+    max-width: 26rem;
+}
+
+.panel-foot {
+    margin: 1.25rem 0 0;
+    color: var(--tater-muted);
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+/* Admin area */
+.admin-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 0.85rem 1.5rem;
+    background: var(--tater-surface);
+    border-bottom: 1px solid var(--tater-border);
+}
+
+.admin-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--tater-text);
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.admin-brand .brand-dots {
+    margin: 0;
+    gap: 0.3rem;
+}
+
+.admin-brand .brand-dots span {
+    width: 0.45rem;
+    height: 0.45rem;
+}
+
+.admin-nav {
+    display: flex;
+    gap: 0.25rem;
+    flex: 1;
+}
+
+.admin-nav a,
+.admin-user a,
+.admin-user .btn-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.8rem;
+    color: var(--tater-muted);
+    font-size: 0.95rem;
+    text-decoration: none;
+    border-radius: 999px;
+}
+
+.admin-nav a:hover,
+.admin-user a:hover,
+.admin-user .btn-link:hover {
+    color: var(--tater-text);
+    background: var(--tater-bg);
+}
+
+.admin-nav a[aria-current="page"],
+.admin-user a[aria-current="page"] {
+    color: var(--tater-text);
+    background: var(--tater-bg);
+    font-weight: 600;
+}
+
+.admin-user {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.admin-user form {
+    margin: 0;
+}
+
+.admin-user .btn-link {
+    border: 0;
+}
+
+.admin-main {
+    flex: 1 0 auto;
+    width: 100%;
+    max-width: 68rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 3rem;
+}
+
+.admin-title {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+}
+
+.admin-card {
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1.25rem;
+    background: var(--tater-surface);
+    border: 1px solid var(--tater-border);
+    border-radius: 1rem;
+}
+
+.admin-card h2,
+.h2-summary {
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.h2-summary {
+    cursor: pointer;
+}
+
+.admin-card-danger {
+    border-color: rgba(172, 78, 149, 0.45);
+}
+
+.admin-form {
+    max-width: 28rem;
+}
+
+.admin-table {
+    --bs-table-bg: transparent;
+}
+
+.admin-table th {
+    color: var(--tater-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.row-actions {
+    display: inline-block;
+    text-align: left;
+}
+
+.row-actions summary {
+    list-style: none;
+}
+
+.row-actions summary::-webkit-details-marker {
+    display: none;
+}
+
+.row-actions-body {
+    width: 22rem;
+    margin-top: 0.75rem;
+    padding: 1.25rem;
+    background: var(--tater-bg);
+    border-radius: 0.85rem;
+}
+
+.row-actions-body h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.status {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 999px;
+}
+
+.status-on {
+    color: #fff;
+    background: var(--tater-blue);
+}
+
+.status-off {
+    color: var(--tater-muted);
+    background: var(--tater-bg);
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem 1.5rem;
+    background: var(--tater-surface);
+    border: 1px solid var(--tater-border);
+    border-radius: 1rem;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.stat-label {
+    color: var(--tater-muted);
+    font-size: 0.9rem;
+}
+
+.admin-facts {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.4rem 1.5rem;
+}
+
+.admin-facts dt {
+    color: var(--tater-muted);
+    font-weight: 400;
+}
+
+.admin-facts dd {
+    margin: 0;
+}
+
+.admin-pager {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    color: var(--tater-muted);
+}
+
+@media (max-width: 767.98px) {
+    .admin-header {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .admin-nav {
+        order: 3;
+        flex-basis: 100%;
+        overflow-x: auto;
+    }
+}
+
 /* Footer */
 .site-footer {
     width: 100%;

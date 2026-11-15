@@ -85,11 +85,22 @@ final readonly class Kernel
                 : $this->notFound();
         }
 
-        // A-3: everything not marked public needs a login. The login arrives in
-        // step 4; until then admin routes are simply not reachable. 404 instead
-        // of 403 so nothing reveals which addresses exist (S-33).
-        if ($route->access !== Access::Public) {
-            return $this->notFound();
+        // A-3: everything not marked public needs a signed-in admin. Checked on
+        // every request (S-32); expired or ended sessions count as signed out.
+        $isAdmin = $route->access !== Access::Public;
+        if ($isAdmin) {
+            if (!$this->services->config->isInstalled()) {
+                return $this->notFound();
+            }
+            if ($this->services->auth()->user() === null) {
+                if ($request->method === 'GET' || $request->method === 'HEAD') {
+                    $target = $request->path . ($request->query === [] ? '' : '?' . http_build_query($request->query));
+
+                    return Response::redirect('/login?next=' . rawurlencode($target));
+                }
+
+                return $this->errorPage(403, 'Signed out', 'Your session has ended. Please sign in again.');
+            }
         }
 
         if ($route->rateLimitPerMinute !== null) {
@@ -125,7 +136,8 @@ final readonly class Kernel
             throw new \LogicException(sprintf('%s::%s must return a Response.', $route->controller, $action));
         }
 
-        return $response;
+        // S-7: pages behind the login are never stored by browsers or proxies.
+        return $isAdmin ? $response->withHeader('Cache-Control', 'no-store') : $response;
     }
 
     private function passesCsrf(Request $request): bool

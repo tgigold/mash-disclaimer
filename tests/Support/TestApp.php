@@ -35,14 +35,17 @@ final class TestApp
     /**
      * @param list<Route>|null $routes
      * @param \Closure(DatabaseSettings): PDO|null $connect
+     * @param \Closure(): int|null $clock
      */
     public function __construct(
         ?Config $config = null,
         ?array $routes = null,
         ?\Closure $connect = null,
         int $phpVersionId = 80500,
+        ?\Closure $clock = null,
+        ?DataDirectory $data = null,
     ) {
-        $this->data = new DataDirectory(sys_get_temp_dir() . '/tater-test-' . bin2hex(random_bytes(6)));
+        $this->data = $data ?? new DataDirectory(sys_get_temp_dir() . '/tater-test-' . bin2hex(random_bytes(6)));
         $this->session = new ArraySession();
         $this->services = new Services(
             $config ?? Config::withDefaults(),
@@ -52,6 +55,7 @@ final class TestApp
             new ErrorLog($this->data),
             $connect,
             $phpVersionId,
+            $clock,
         );
 
         /** @var list<Route> $defaultRoutes */
@@ -63,10 +67,17 @@ final class TestApp
      * @param array<string, mixed> $body
      * @param array<string, string> $server
      * @param array<string, string> $query
+     * @param array<string, string> $cookies
      */
-    public function request(string $method, string $path, array $body = [], array $server = [], array $query = []): Response
-    {
-        return $this->kernel->handle(new Request($method, $path, $query, $server, $body));
+    public function request(
+        string $method,
+        string $path,
+        array $body = [],
+        array $server = [],
+        array $query = [],
+        array $cookies = [],
+    ): Response {
+        return $this->kernel->handle(new Request($method, $path, $query, $server, $body, $cookies));
     }
 
     /**

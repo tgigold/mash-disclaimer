@@ -6,6 +6,14 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 
 ### Hinzugefügt
 
+- Admin-Bereich unter `/admin` mit Anmeldung: Dashboard mit Kennzahlen, Nutzerverwaltung (anlegen, neues Passwort setzen, deaktivieren, reaktivieren), Change history aus dem Audit-Log, Updates für Datenbank-Migrationen im Browser, eigenes Konto (Passwort ändern, Daten herunterladen, Konto löschen).
+- Login mit Argon2id, Sperre nach 5 Fehlversuchen pro IP bzw. 25 insgesamt für 15 Minuten, Ausnahme für bekannte Geräte, Sitzungsende nach 2 Stunden Inaktivität bzw. 12 Stunden.
+- Sensible Aktionen fragen das eigene Passwort erneut ab; ein neues Passwort oder das Deaktivieren beendet alle Sitzungen des Kontos.
+- Aufbewahrungsfristen: Login-Fehlversuche 15 Minuten, bekannte Geräte 1 Jahr, gekürzte IPs im Audit-Log 90 Tage, Audit-Log 24 Monate.
+- Migration `0002`: Tabellen für Login-Fehlversuche und bekannte Geräte.
+
+### Hinzugefügt
+
 - Öffentliche Suche auf der Startseite: Vorschläge beim Tippen, Tastaturbedienung (Pfeile, Enter, Esc), Treffer ohne Seitenwechsel, Trefferliste bei mehreren Fahrzeugen, „No match“, Copy-Button mit Rückmeldung; funktioniert auch ohne JavaScript als GET-Formular.
 - Feste Adresse je Fahrzeug unter `/vehicles/{id}/{slug}` mit Weiterleitung auf den richtigen Slug.
 - Lesende JSON-API `/api/v1/search` und `/api/v1/vehicles/{id}` mit einheitlichem Fehlerformat.

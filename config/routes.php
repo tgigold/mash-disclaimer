@@ -7,9 +7,15 @@ declare(strict_types=1);
  * a login. Every POST needs a CSRF token; the kernel checks it (S-12).
  */
 
+use Lab09\Disclaimer\Controller\Admin\AccountController;
+use Lab09\Disclaimer\Controller\Admin\DashboardController;
+use Lab09\Disclaimer\Controller\Admin\HistoryController;
+use Lab09\Disclaimer\Controller\Admin\UpdateController;
+use Lab09\Disclaimer\Controller\Admin\UserController;
 use Lab09\Disclaimer\Controller\ApiController;
 use Lab09\Disclaimer\Controller\HealthController;
 use Lab09\Disclaimer\Controller\HomeController;
+use Lab09\Disclaimer\Controller\LoginController;
 use Lab09\Disclaimer\Controller\SetupController;
 use Lab09\Disclaimer\Http\Access;
 use Lab09\Disclaimer\Http\Route;
@@ -29,4 +35,24 @@ return [
     // and answers 404 once the installation is complete (G-11).
     Route::get('/setup', SetupController::class, 'show', Access::Public),
     Route::post('/setup', SetupController::class, 'submit', Access::Public),
+
+    // Sign in. Public by necessity, with a rate limit on top of the login lock (S-31).
+    Route::get('/login', LoginController::class, 'show', Access::Public)->limit(60),
+    Route::post('/login', LoginController::class, 'login', Access::Public)->limit(30),
+
+    // Admin area – no Access::Public, so every route needs a signed-in admin (A-3).
+    Route::post('/logout', LoginController::class, 'logout'),
+    Route::get('/admin', DashboardController::class, 'index'),
+    Route::get('/admin/users', UserController::class, 'index'),
+    Route::post('/admin/users', UserController::class, 'create'),
+    Route::post('/admin/users/{id}/password', UserController::class, 'password'),
+    Route::post('/admin/users/{id}/deactivate', UserController::class, 'deactivate'),
+    Route::post('/admin/users/{id}/activate', UserController::class, 'activate'),
+    Route::get('/admin/history', HistoryController::class, 'index'),
+    Route::get('/admin/updates', UpdateController::class, 'index'),
+    Route::post('/admin/updates', UpdateController::class, 'migrate'),
+    Route::get('/admin/account', AccountController::class, 'index'),
+    Route::post('/admin/account/password', AccountController::class, 'password'),
+    Route::get('/admin/account/export', AccountController::class, 'export'),
+    Route::post('/admin/account/delete', AccountController::class, 'delete'),
 ];

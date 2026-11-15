@@ -22,6 +22,10 @@ final class Config
         'trusted_proxies' => [],
         // Database connection; written by the setup. null = not installed.
         'db' => null,
+        // S-11: an admin session ends after this much inactivity …
+        'session_idle_minutes' => 120,
+        // … and at the latest this long after the login.
+        'session_absolute_hours' => 12,
     ];
 
     /** @param array<string, mixed> $values */
@@ -68,6 +72,23 @@ final class Config
         $proxies = $this->values['trusted_proxies'] ?? [];
 
         return is_array($proxies) ? array_values(array_filter($proxies, 'is_string')) : [];
+    }
+
+    public function sessionIdleSeconds(): int
+    {
+        return $this->positiveInt('session_idle_minutes', 120) * 60;
+    }
+
+    public function sessionAbsoluteSeconds(): int
+    {
+        return $this->positiveInt('session_absolute_hours', 12) * 3600;
+    }
+
+    private function positiveInt(string $key, int $default): int
+    {
+        $value = $this->values[$key] ?? $default;
+
+        return is_int($value) && $value > 0 ? $value : $default;
     }
 
     public function database(): ?DatabaseSettings

@@ -84,7 +84,7 @@ Dieselbe Normalisierung gilt für den Import und für Werte, die im Admin von Ha
 3. Bleibt etwas anderes als `Zahl / Zahl`, eine einzelne Zahl bzw. eine Klasse `A`–`G` oder `X-Y` übrig (z. B. `N/A`) in einem für den Typ benötigten Feld → beim Import wird der Datensatz nicht automatisch übernommen, sondern dem Nutzer vorgelegt; im Formular ist es ein Validierungsfehler.
 4. Zahlenpaare: **immer höherer Wert zuerst**, mit `-` verbunden (`7 / 5` → `7-5`). Das gilt auch für die Reichweite: `729.0 / 911.0` → `911-729`.
 5. Identische Paare werden zu einem Wert: `10.4 / 10.4` → `10.4`.
-6. Verglichen wird numerisch, **ausgegeben wird der Originaltext** (Punkt als Dezimalzeichen, Nachkommastellen wie geliefert). Verbrauch in Litern und kWh behält das `.0` (`10.0` bleibt `10.0`). Es wird nie gerechnet oder gerundet.
+6. Verglichen wird numerisch, **ausgegeben wird der Originaltext** (Punkt als Dezimalzeichen, Nachkommastellen wie geliefert). Verbrauch in Litern und kWh behält das `.0` (`10.0` bleibt `10.0`). Es wird nie gerechnet oder gerundet. Ein Dezimalkomma, wie es ein deutsches Excel kopiert (`10,4`), wird als Punkt gelesen und gespeichert (`10.4`).
 7. **Kilometer stehen nur als ganze Zahl:** Bei der Reichweite fällt das `.0` weg (`911.0` → `911`). Käme je eine andere Nachkommastelle (`425.5`), wird nicht gerundet, sondern der Datensatz dem Nutzer vorgelegt.
 8. CO₂-Klassen: höherer Buchstabe zuerst (`D-E` → `E-D`), identische zu einem (`E-E` → `E`).
 

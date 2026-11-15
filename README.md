@@ -50,7 +50,7 @@ Jeder Schritt ist ein Pull Request mit Tests, CHANGELOG und README-Pflege; jedes
 | 2 | Setup, Migrationen, Schema, Fake-Daten | Installation auf dem Webspace läuft durch | 4.1.0 |
 | 3 | Öffentliche Suche | Autovervollständigung, Treffer, Copy auf Fake-Daten | 4.2.0 |
 | 4 | Login, Nutzerverwaltung, Audit-Log | Admin-Bereich erreichbar und abgesichert | 4.3.0 |
-| 5 | Fahrzeugverwaltung | Liste, live/zurückziehen, bearbeiten, zurücksetzen, von Hand anlegen, Textgenerator | |
+| 5 | Fahrzeugverwaltung | Liste, live/zurückziehen, bearbeiten, zurücksetzen, von Hand anlegen, Textgenerator | 4.4.0 |
 | 6 | Import | Upload, Einlesen, Prüfschritt, Übernehmen, Frontend-Sperre | |
 | 7 | Ablösung V3 | Umzug auf `disclaimer.lab09.de`, V3 abschalten | |
 
@@ -247,6 +247,17 @@ Per SSH im Projektverzeichnis. Auf dem Webspace ist `php` noch Version 8.3, desh
 | `php85 bin/console user:create <name>` | Notzugang: Admin anlegen, falls niemand mehr hineinkommt. Das Passwort wird verdeckt abgefragt und nicht als Argument übergeben. |
 
 Im Browser stehen die Migrationen unter **Admin → Updates**. Ausnahme ist `0002_login_protection`: Der Login braucht ihre Tabellen, deshalb läuft sie einmalig per `php85 bin/console migrate`.
+
+### Notzugang
+
+Gibt es kein aktives Admin-Konto mehr, oder haben alle ihr Passwort vergessen, legt dieser Befehl per SSH ein neues Admin-Konto an:
+
+```sh
+cd <Projektverzeichnis>
+php85 bin/console user:create <name>
+```
+
+Das Passwort wird verdeckt abgefragt (mindestens 12 Zeichen). Es erscheint weder in der Shell-History noch in der Prozessliste. Im Audit-Log steht „Added admin … via command line“, ohne Nutzer. Mit dem neuen Konto lassen sich unter **Users** die anderen Konten reaktivieren oder neue Passwörter setzen. Wer SSH-Zugang zum Server hat, hat ohnehin vollen Zugriff; der Befehl öffnet also keine neue Tür.
 
 ## Konfiguration
 

@@ -10,11 +10,13 @@ use Lab09\Disclaimer\Security\Csrf;
 use Lab09\Disclaimer\Security\Session;
 use Lab09\Disclaimer\Service\AuthService;
 use Lab09\Disclaimer\Service\UpdateService;
+use Lab09\Disclaimer\Service\VehicleService;
 use Lab09\Disclaimer\Support\View;
 
 /**
  * "Updates": database migrations in the browser (G-12) – POST with CSRF token,
- * backup first, entry in the audit log.
+ * backup first, entry in the audit log – and "Regenerate texts" after a
+ * template change.
  */
 final class UpdateController extends AdminController
 {
@@ -24,6 +26,7 @@ final class UpdateController extends AdminController
         Csrf $csrf,
         Session $session,
         private readonly UpdateService $updates,
+        private readonly VehicleService $vehicles,
     ) {
         parent::__construct($view, $auth, $csrf, $session);
     }
@@ -44,5 +47,12 @@ final class UpdateController extends AdminController
         return $this->redirectWith('/admin/updates', $applied === []
             ? 'Nothing to do – the database is up to date.'
             : 'Applied: ' . implode(', ', $applied) . '. A backup was written first.');
+    }
+
+    public function regenerate(Request $request): Response
+    {
+        $count = $this->vehicles->regenerateAll($this->actor(), self::ip($request));
+
+        return $this->redirectWith('/admin/updates', sprintf('%d live text%s rebuilt from the current templates.', $count, $count === 1 ? '' : 's'));
     }
 }

@@ -21,6 +21,13 @@ $labels = [
     'sample_data.loaded' => 'Loaded sample vehicles',
     'sample_data.removed' => 'Removed sample vehicles',
     'migrations.applied' => 'Applied database updates',
+    'vehicle.created' => 'Created vehicle',
+    'vehicle.updated' => 'Edited vehicle',
+    'vehicle.live' => 'Put live',
+    'vehicle.withdrawn' => 'Withdrew',
+    'vehicle.reset' => 'Reset to factory values',
+    'vehicle.deleted' => 'Deleted vehicle',
+    'texts.regenerated' => 'Regenerated live texts',
 ];
 
 $describe = static function (array $details): string {

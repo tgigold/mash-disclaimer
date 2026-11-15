@@ -37,6 +37,15 @@ use Lab09\Disclaimer\Security\Csrf;
 <?php endif ?>
 </section>
 
+<section class="admin-card">
+    <h2>Disclaimer texts</h2>
+    <p>After a change to <code>config/disclaimer-templates.php</code>, rebuild every live text from its name, values and the new template. Values and the “edited” marks stay as they are.</p>
+    <form method="post" action="/admin/updates/regenerate">
+        <input type="hidden" name="<?= e(Csrf::FIELD) ?>" value="<?= e($csrfToken) ?>">
+        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-arrow-repeat" aria-hidden="true"></i> Regenerate texts</button>
+    </form>
+</section>
+
 <?php if ($applied !== []): ?>
 <section class="admin-card">
     <h2>Applied</h2>

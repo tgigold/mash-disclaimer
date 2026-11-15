@@ -9,6 +9,7 @@ use Lab09\Disclaimer\Controller\Admin\DashboardController;
 use Lab09\Disclaimer\Controller\Admin\HistoryController;
 use Lab09\Disclaimer\Controller\Admin\UpdateController;
 use Lab09\Disclaimer\Controller\Admin\UserController;
+use Lab09\Disclaimer\Controller\Admin\VehicleController;
 use Lab09\Disclaimer\Controller\ApiController;
 use Lab09\Disclaimer\Controller\Controller;
 use Lab09\Disclaimer\Controller\HealthController;
@@ -28,12 +29,14 @@ use Lab09\Disclaimer\Security\Session;
 use Lab09\Disclaimer\Security\SetupCode;
 use Lab09\Disclaimer\Service\AuthService;
 use Lab09\Disclaimer\Service\BackupService;
+use Lab09\Disclaimer\Service\DisclaimerBuilder;
 use Lab09\Disclaimer\Service\Installer;
 use Lab09\Disclaimer\Service\Migrator;
 use Lab09\Disclaimer\Service\RetentionService;
 use Lab09\Disclaimer\Service\SearchService;
 use Lab09\Disclaimer\Service\UpdateService;
 use Lab09\Disclaimer\Service\UserService;
+use Lab09\Disclaimer\Service\VehicleService;
 use Lab09\Disclaimer\Support\DataDirectory;
 use Lab09\Disclaimer\Support\ErrorLog;
 use Lab09\Disclaimer\Support\View;
@@ -126,6 +129,16 @@ final class Services
         return new Installer($this->data, new SetupCode($this->data), $this->connect, $this->phpVersionId);
     }
 
+    public function vehicleService(): VehicleService
+    {
+        return new VehicleService(
+            $this->pdo(),
+            new VehicleRepository($this->pdo()),
+            new AuditLogRepository($this->pdo()),
+            DisclaimerBuilder::fromFile(App::rootPath('config/disclaimer-templates.php')),
+        );
+    }
+
     private function userService(): UserService
     {
         return new UserService($this->pdo(), new UserRepository($this->pdo()), new AuditLogRepository($this->pdo()));
@@ -170,7 +183,22 @@ final class Services
                 $this->session,
                 new AuditLogRepository($this->pdo()),
             ),
-            UpdateController::class => new UpdateController($this->view, $this->auth(), $this->csrf(), $this->session, $this->updates()),
+            UpdateController::class => new UpdateController(
+                $this->view,
+                $this->auth(),
+                $this->csrf(),
+                $this->session,
+                $this->updates(),
+                $this->vehicleService(),
+            ),
+            VehicleController::class => new VehicleController(
+                $this->view,
+                $this->auth(),
+                $this->csrf(),
+                $this->session,
+                new VehicleRepository($this->pdo()),
+                $this->vehicleService(),
+            ),
             AccountController::class => new AccountController($this->view, $this->auth(), $this->csrf(), $this->session, $this->userService()),
             SetupController::class => new SetupController(
                 $this->view,

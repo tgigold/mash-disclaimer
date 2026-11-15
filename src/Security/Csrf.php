@@ -60,7 +60,10 @@ final readonly class Csrf
 
         // Before the setup there is no base URL yet; then the origin has to match
         // the host the request was sent to.
-        $expectedHost = $baseUrl !== null ? (string) parse_url($baseUrl, PHP_URL_HOST) : $request->host();
+        // The Host header may carry a port ("localhost:8080"); only the name counts.
+        $expectedHost = $baseUrl !== null
+            ? (string) parse_url($baseUrl, PHP_URL_HOST)
+            : (string) preg_replace('/:\d+$/', '', $request->host());
         $originHost = parse_url($origin, PHP_URL_HOST);
 
         return is_string($originHost) && strcasecmp($originHost, $expectedHost) === 0;

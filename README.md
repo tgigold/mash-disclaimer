@@ -97,11 +97,22 @@ Unter `/admin`, erreichbar über „Dashboard“ in der Fußzeile. Jede Seite do
 
 | Bereich | Inhalt |
 |---|---|
-| Dashboard | Kennzahlen (Fahrzeuge, live, Entwürfe, aktive Admins), Hinweis auf ausstehende Updates. Die Fahrzeugliste kommt mit Schritt 5. |
+| Dashboard | Kennzahlen (Fahrzeuge, live, Entwürfe, aktive Admins), Hinweis auf ausstehende Updates |
+| Vehicles | Liste aller Fahrzeuge mit Filtern und Seitenleiste zum Bearbeiten, siehe unten |
 | Users | Admins anlegen, neues Passwort setzen, deaktivieren und reaktivieren. Jede Aktion fragt das eigene Passwort ab (`S-35`). Das letzte aktive Konto lässt sich nicht deaktivieren. |
 | Change history | das Audit-Log, neueste zuerst, 50 je Seite |
-| Updates | ausstehende Datenbank-Migrationen ansehen und mit Backup ausführen (`G-12`) |
+| Updates | ausstehende Datenbank-Migrationen ansehen und mit Backup ausführen (`G-12`); „Regenerate texts“ nach einer Änderung der Disclaimer-Vorlagen |
 | Konto (Name oben rechts) | eigenes Passwort ändern, eigene Daten als JSON herunterladen, eigenes Konto löschen (`D-8`) |
+
+**Fahrzeuge**
+
+- Die Liste zeigt alle Fahrzeuge der Work-Tabelle. Filtern lässt sie sich nach Typ, Status (Live/Draft) und Herkunft (Import/Manual), dazu gibt es eine Suche über Name, Typschlüssel, Reihe und Namen laut XLSX. Oben stehen die Kennzahlen.
+- Ein Klick öffnet die Seitenleiste mit Name, Werten und **Vorschau** des Disclaimers. Die Vorschau aktualisiert sich beim Tippen. Der Text selbst ist nicht bearbeitbar, er entsteht immer aus Vorlage, Name und Werten.
+- **Werte** dürfen so eingegeben werden, wie sie in Excel stehen: `19.5 / 17.2`, `10,4 / 9,8`, `D-E`, `729.0 / 911.0`. Gespeichert wird die normalisierte Form (`19.5-17.2`, `10.4-9.8`, `E-D`, `911-729`), nach denselben Regeln wie beim Import (`docs/fachlogik.md`, Abschnitt 2). `N/A` oder Text sind ein Fehler im Formular.
+- **Importierte Fahrzeuge:** Typ, Typschlüssel, Reihe und Marke stammen aus der XLSX und sind fest. Im Entwurf zeigt das Formular die Werksangaben; bearbeiten lassen sich die Werte erst, wenn das Fahrzeug live ist. Geänderte Live-Werte sind als „edited“ markiert, „Reset to factory values“ holt die Werksangaben zurück. Der eigene Name bleibt dabei erhalten.
+- **Von Hand angelegte Fahrzeuge** („New vehicle“): Name, Marke, Typ und Werte sind Pflicht, Typschlüssel und Reihe optional. Sie starten als Entwurf. Ein Typschlüssel darf nur einmal vorkommen.
+- **Put live / Withdraw** stellen ein Fahrzeug in die Suche oder nehmen es heraus. **Delete** löscht es; ein importiertes Fahrzeug bietet der nächste Import dann wieder als neu an.
+- Jede Aktion steht im Audit-Log.
 
 **Anmeldung und Sitzungen**
 
@@ -233,6 +244,7 @@ Per SSH im Projektverzeichnis. Auf dem Webspace ist `php` noch Version 8.3, desh
 | `php85 bin/console migrate:status` | angewandte und ausstehende Migrationen |
 | `php85 bin/console backup` | Backup aller `v4_`-Tabellen nach `data/backups/` |
 | `php85 bin/console sample-data:load` / `:remove` | Beispielfahrzeuge anlegen / entfernen |
+| `php85 bin/console user:create <name>` | Notzugang: Admin anlegen, falls niemand mehr hineinkommt. Das Passwort wird verdeckt abgefragt und nicht als Argument übergeben. |
 
 Im Browser stehen die Migrationen unter **Admin → Updates**. Ausnahme ist `0002_login_protection`: Der Login braucht ihre Tabellen, deshalb läuft sie einmalig per `php85 bin/console migrate`.
 

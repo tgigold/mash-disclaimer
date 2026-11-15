@@ -67,12 +67,16 @@ jobs:
       # built-in PHP server with the sample vehicles in a separate database and
       # drive the runner's Chrome via the DevTools protocol (tests/Browser/).
       - name: Prepare app for browser tests
+        env:
+          # Throwaway account in a throwaway database, not a secret.
+          ADMIN_PASSWORD: ci browser test password
         run: |
           mysql --host=127.0.0.1 --user=root -e 'CREATE DATABASE tater_browser CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
           mkdir -p data
           php -r 'require "vendor/autoload.php"; file_put_contents("data/config.php", Lab09\Disclaimer\Config::export(["db" => ["host" => "127.0.0.1", "port" => 3306, "name" => "tater_browser", "user" => "root", "password" => ""]]));'
           php bin/console migrate
           php bin/console sample-data:load
+          printf '%s\n' "$ADMIN_PASSWORD" | php bin/console user:create ci-admin
           php -S 127.0.0.1:8080 -t public > "$RUNNER_TEMP/php-server.log" 2>&1 &
           google-chrome --headless=new --disable-gpu --no-first-run --remote-debugging-port=9222 \
             --user-data-dir="$RUNNER_TEMP/chrome" about:blank > "$RUNNER_TEMP/chrome.log" 2>&1 &
@@ -86,9 +90,15 @@ jobs:
 
       - name: Browser tests
         env:
-          BASE_URL: http://127.0.0.1:8080
+          # localhost, not 127.0.0.1: Chrome accepts the Secure __Host- session
+          # cookie on http://localhost as a trustworthy origin.
+          BASE_URL: http://localhost:8080
           DEBUG_PORT: '9222'
-        run: python3 -I tests/Browser/test_search.py
+          ADMIN_USER: ci-admin
+          ADMIN_PASSWORD: ci browser test password
+        run: |
+          python3 -I tests/Browser/test_search.py
+          python3 -I tests/Browser/test_admin.py
 
       - name: Server log on failure
         if: failure()

@@ -126,6 +126,9 @@ final class ImportTest extends DatabaseTestCase
         self::assertStringContainsString('Discontinued', $body);
         self::assertStringContainsString('Merge with 81GE', $body);
         self::assertStringContainsString('Type code 21HJ appears 2 times in the file.', $body);
+        self::assertStringNotContainsString('name="import_new[]" value="' . $this->itemIds($id)['51JB'] . '" checked', $body, 'New vehicles start unticked.');
+        self::assertStringContainsString('data-check-all="import_new[]"', $body);
+        self::assertStringContainsString('<span class="stat-value stat-value-text">Never</span>', $this->get('/admin')->body);
     }
 
     public function testApplyOnlyActiveKeepsNamesAndOverwritesEditedValues(): void
@@ -195,6 +198,7 @@ final class ImportTest extends DatabaseTestCase
         }
         self::assertNotNull($this->vehicles->find('GPNE0001'), 'Missing vehicles are kept by default.');
         self::assertNotNull($this->vehicles->find('HAND0001'));
+        self::assertMatchesRegularExpression('/<time datetime="\\d{4}-\\d{2}-\\d{2}T[^"]+" title="[^"]+">[^<]+<\\/time><\\/span>\\s*<span class="stat-label">Last import/', $this->get('/admin')->body);
     }
 
     public function testApplySelectedAndProblemAsDraft(): void

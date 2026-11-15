@@ -59,6 +59,15 @@ final readonly class ImportRepository
         return array_values(array_map(self::hydrate(...), $stmt->fetchAll()));
     }
 
+    /** When the last import was applied (UTC), if ever. */
+    public function lastAppliedAt(): ?string
+    {
+        $stmt = $this->pdo->query('SELECT MAX(applied_at) FROM v4_imports');
+        $at = $stmt === false ? null : $stmt->fetchColumn();
+
+        return is_string($at) ? $at : null;
+    }
+
     /** The import that is being reviewed, if any. */
     public function inReview(): ?int
     {

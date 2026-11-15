@@ -6,6 +6,7 @@ namespace Lab09\Disclaimer\Controller\Admin;
 
 use Lab09\Disclaimer\Http\Request;
 use Lab09\Disclaimer\Http\Response;
+use Lab09\Disclaimer\Repository\ImportRepository;
 use Lab09\Disclaimer\Repository\UserRepository;
 use Lab09\Disclaimer\Repository\VehicleRepository;
 use Lab09\Disclaimer\Security\Csrf;
@@ -15,8 +16,7 @@ use Lab09\Disclaimer\Service\UpdateService;
 use Lab09\Disclaimer\Support\View;
 
 /**
- * Start page of the admin area: key figures and pending updates. The vehicle
- * list arrives with step 5.
+ * Start page of the admin area: key figures, the last import and pending updates.
  */
 final class DashboardController extends AdminController
 {
@@ -28,6 +28,7 @@ final class DashboardController extends AdminController
         private readonly VehicleRepository $vehicles,
         private readonly UserRepository $users,
         private readonly UpdateService $updates,
+        private readonly ImportRepository $imports,
     ) {
         parent::__construct($view, $auth, $csrf, $session);
     }
@@ -38,6 +39,7 @@ final class DashboardController extends AdminController
             'counts' => $this->vehicles->counts(),
             'activeUsers' => $this->users->countActive(),
             'pending' => $this->updates->status()['pending'],
+            'lastImport' => $this->imports->lastAppliedAt(),
         ]);
     }
 }

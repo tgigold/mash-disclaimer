@@ -41,7 +41,8 @@ final class HomeController extends Controller
     }
 
     /**
-     * /vehicles/{id}/{slug}: one vehicle; the slug is cosmetic (A-5).
+     * /vehicles/{id}: one vehicle (A-5). Addresses with a name slug from
+     * 4.0 to 4.5 redirect there.
      *
      * @param array<string, string> $params
      */
@@ -52,7 +53,7 @@ final class HomeController extends Controller
             return $this->notFound();
         }
 
-        if (($params['slug'] ?? null) !== $vehicle->slug()) {
+        if (isset($params['slug'])) {
             return Response::redirect($vehicle->path(), 301);
         }
 

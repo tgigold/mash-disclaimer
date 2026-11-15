@@ -208,6 +208,7 @@ final class Services
                 new VehicleRepository($this->pdo()),
                 new UserRepository($this->pdo()),
                 $this->updates(),
+                new ImportRepository($this->pdo()),
             ),
             UserController::class => new UserController(
                 $this->view,

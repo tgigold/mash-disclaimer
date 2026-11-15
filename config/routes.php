@@ -27,6 +27,7 @@ return [
     // vehicle per URL, and the read-only API behind the search field.
     Route::get('/', HomeController::class, 'index', Access::Public)->limit(120)->lockable(),
     Route::get('/vehicles/{id}', HomeController::class, 'vehicle', Access::Public)->limit(120)->lockable(),
+    // Old addresses with a name slug (up to 4.5) redirect to /vehicles/{id}.
     Route::get('/vehicles/{id}/{slug}', HomeController::class, 'vehicle', Access::Public)->limit(120)->lockable(),
     Route::get('/api/v1/search', ApiController::class, 'search', Access::Public)->limit(300)->lockable(),
     Route::get('/api/v1/vehicles/{id}', ApiController::class, 'vehicle', Access::Public)->limit(300)->lockable(),

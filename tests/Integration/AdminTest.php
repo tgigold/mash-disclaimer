@@ -380,6 +380,7 @@ final class AdminTest extends DatabaseTestCase
         $this->pdo->exec("DELETE FROM v4_migrations WHERE version = '0002_login_protection'");
 
         self::assertStringContainsString('0002_login_protection', $this->get($browser, '/admin/updates')->body);
+        self::assertStringContainsString('href="/admin/updates"', $this->get($browser, '/admin/history')->body, 'Updates are linked from Change history.');
         self::assertStringContainsString('1 database update waiting', $this->get($browser, '/admin')->body);
 
         $response = $browser->post('/admin/updates', [], $this->server());

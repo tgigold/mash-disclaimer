@@ -30,7 +30,7 @@ final class VehicleAdminTest extends DatabaseTestCase
 {
     private const string PASSWORD = 'correct horse battery staple';
 
-    private const string IMPORTED = 'IMP0RT01';
+    private const string IMPORTED = 'MPRT0001';
 
     private DataDirectory $data;
 
@@ -224,15 +224,15 @@ final class VehicleAdminTest extends DatabaseTestCase
 
     public function testGoLiveWithMissingValuesIsRefused(): void
     {
-        $this->vehicles->insert(new Vehicle('MISSING1', '99XX', 'import', Brand::BMW, null, Drivetrain::PHEV, 'Incomplete PHEV', [
+        $this->vehicles->insert(new Vehicle('MSSNG001', '99XX', 'import', Brand::BMW, null, Drivetrain::PHEV, 'Incomplete PHEV', [
             'fuel_consumption' => '1.0', 'co2_class' => 'B',
         ]));
 
-        $response = $this->admin->post('/admin/vehicles/MISSING1/live', [], $this->server());
+        $response = $this->admin->post('/admin/vehicles/MSSNG001/live', [], $this->server());
 
         self::assertSame(422, $response->status);
         self::assertStringContainsString('Some values this type needs are missing.', $response->body);
-        self::assertNull($this->vehicles->liveText('MISSING1'));
+        self::assertNull($this->vehicles->liveText('MSSNG001'));
     }
 
     public function testDeleteRemovesVehicleAndLogsIt(): void

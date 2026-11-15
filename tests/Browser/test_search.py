@@ -7,6 +7,7 @@ locally see README, "Browser-Tests".
 Run: python3 -I tests/Browser/test_search.py
 """
 
+import time
 import os
 import sys
 import traceback
@@ -80,6 +81,18 @@ def test_submit_list_no_match_and_back():
     b.js('document.querySelector("[data-vehicle-link]").click()')
     b.wait('document.querySelector(".result-card")')
     assert b.js('performance.getEntriesByType("navigation").length') == 1, 'no page reload'
+
+
+def test_enter_right_after_typing_keeps_the_result():
+    # Regression: the suggestions due after the typing pause used to cancel the
+    # full search and open over the result.
+    b = open_page()
+    b.type('sedan')
+    b.press('Enter')
+    assert b.wait('document.querySelector(".result-list-title")?.textContent') == '4 matches – choose a vehicle'
+    time.sleep(0.5)
+    assert b.js('document.getElementById("search-suggestions").hidden') is True
+    assert b.js('document.querySelector(".result-list-title")?.textContent') == '4 matches – choose a vehicle'
 
 
 def test_copy_puts_disclaimer_on_clipboard():

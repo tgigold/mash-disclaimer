@@ -527,6 +527,8 @@ body {
 }
 
 .form-control:focus {
+    color: var(--tater-text);
+    background-color: var(--tater-surface);
     border-color: var(--tater-blue);
     box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
 }

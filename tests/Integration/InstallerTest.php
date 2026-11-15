@@ -90,7 +90,7 @@ final class InstallerTest extends DatabaseTestCase
         $expected = DisclaimerBuilder::fromFile(App::rootPath('config/disclaimer-templates.php'))->build(
             Drivetrain::BEV,
             'BMW i5 eDrive40 Sedan',
-            ['electric_consumption' => '18.9-15.9', 'co2_class' => 'A', 'electric_range' => '582-497'],
+            ['electric_consumption' => '18.9-15.9', 'co2_class' => 'A', 'electric_range' => '497-582'],
         );
         self::assertSame($expected, $vehicles->liveText($id));
     }

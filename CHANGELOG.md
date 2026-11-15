@@ -24,6 +24,8 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 
 ### Behoben
 
+- Reichweiten stehen jetzt von niedrig nach hoch (`455-456` statt `456-455`); alle anderen Werte bleiben hoch–niedrig. Migration `0004` dreht gespeicherte Reichweiten im Bestand und in den Live-Texten um.
+
 - Suche: Wer tippte und sofort Enter drückte, bekam manchmal kein Ergebnis, weil die verzögerten Vorschläge die volle Suche abbrachen und sich über das Ergebnis legten. Das galt auch für „Zurück“ im Browser. Vorschläge und volle Suche haben jetzt getrennte Anfragen, und Enter verwirft ausstehende Vorschläge.
 
 ## [4.4.0] – 2026-11-15

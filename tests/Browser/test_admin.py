@@ -54,7 +54,7 @@ def test_new_vehicle_fields_follow_type_and_preview_updates():
     set_value(b, '#v-electric_range', '400.0 / 420.0')
     text = b.wait(f'{PREVIEW}.startsWith("Browser Test BEV.") && {PREVIEW}', timeout=5)
     assert '15.5-14.0 kWh/100 km' in text, text
-    assert 'electric range: 420-400 km.' in text, text
+    assert 'electric range: 400-420 km.' in text, text
 
 
 def test_preview_names_the_problem():

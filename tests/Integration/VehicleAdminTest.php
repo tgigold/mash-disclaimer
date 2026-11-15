@@ -105,7 +105,7 @@ final class VehicleAdminTest extends DatabaseTestCase
         self::assertSame('manual', $vehicle->origin);
         self::assertSame('U11', $vehicle->series);
         self::assertNull($vehicle->typeCode);
-        self::assertSame(['16.9-14.4', 'A', '475-436', null], [
+        self::assertSame(['16.9-14.4', 'A', '436-475', null], [
             $vehicle->values['electric_consumption'], $vehicle->values['co2_class'], $vehicle->values['electric_range'], $vehicle->values['fuel_consumption'],
         ]);
         self::assertNull($this->vehicles->liveText($id), 'New vehicles start as drafts.');
@@ -219,7 +219,7 @@ final class VehicleAdminTest extends DatabaseTestCase
         self::assertSame('19.0-16.0', $detail->vehicle->values['electric_consumption']);
         self::assertSame('19.0-16.0', $detail->liveValues['electric_consumption'] ?? null);
         self::assertFalse($detail->isEdited);
-        self::assertStringContainsString('electric range: 580-500 km.', (string) $detail->liveText);
+        self::assertStringContainsString('electric range: 500-580 km.', (string) $detail->liveText);
     }
 
     public function testGoLiveWithMissingValuesIsRefused(): void

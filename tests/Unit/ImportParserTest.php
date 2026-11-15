@@ -64,7 +64,7 @@ final class ImportParserTest extends TestCase
         $v = self::$vehicles['NA0/51JB'];
 
         self::assertSame('BEV', $v->drivetrain);
-        self::assertSame(['electric_consumption' => '18.0-13.4', 'co2_class' => 'A', 'electric_range' => '911-729'], $v->values);
+        self::assertSame(['electric_consumption' => '18.0-13.4', 'co2_class' => 'A', 'electric_range' => '729-911'], $v->values);
         self::assertSame('NA0 ', $v->sheet, 'The tab name with its trailing space.');
         self::assertSame('NA0', $v->series);
     }

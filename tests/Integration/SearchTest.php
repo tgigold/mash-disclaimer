@@ -103,7 +103,7 @@ final class SearchTest extends DatabaseTestCase
         $body = $this->get('/', ['q' => 'iX'])->body;
 
         self::assertStringContainsString('<h2 class="result-title">BMW iX xDrive60</h2>', $body);
-        self::assertStringContainsString('electric range: 701-596 km.', $body);
+        self::assertStringContainsString('electric range: 596-701 km.', $body);
         self::assertStringContainsString('Z0008 · I20', $body);
     }
 

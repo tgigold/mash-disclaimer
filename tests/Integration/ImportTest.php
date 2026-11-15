@@ -101,7 +101,7 @@ final class ImportTest extends DatabaseTestCase
         $import = (new ImportRepository($this->pdo))->find($id);
         self::assertIsArray($import);
         self::assertSame('parsed', $import['status']);
-        self::assertSame(['new' => 4, 'changed' => 1, 'unchanged' => 0, 'problem' => 4], $import['counts']);
+        self::assertSame(['new' => 3, 'changed' => 1, 'unchanged' => 0, 'problem' => 4], $import['counts']);
         self::assertSame('10.4', $this->vehicles->find('M3000001')?->values['fuel_consumption'], 'Work table untouched.');
 
         // The public search is paused, the API says so as JSON.

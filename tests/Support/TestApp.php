@@ -28,9 +28,14 @@ final class TestApp
 
     public readonly ArraySession $session;
 
-    public readonly Services $services;
+    /** The services of the latest request – like in production, one set per request. */
+    public Services $services;
 
-    private Kernel $kernel;
+    /** @var \Closure(): Services */
+    private \Closure $makeServices;
+
+    /** @var list<Route> */
+    private array $routes;
 
     /**
      * @param list<Route>|null $routes
@@ -47,8 +52,9 @@ final class TestApp
     ) {
         $this->data = $data ?? new DataDirectory(sys_get_temp_dir() . '/tater-test-' . bin2hex(random_bytes(6)));
         $this->session = new ArraySession();
-        $this->services = new Services(
-            $config ?? Config::withDefaults(),
+        $config ??= Config::withDefaults();
+        $this->makeServices = fn (): Services => new Services(
+            $config,
             $this->data,
             $this->session,
             new View(App::rootPath('templates')),
@@ -57,10 +63,11 @@ final class TestApp
             $phpVersionId,
             $clock,
         );
+        $this->services = ($this->makeServices)();
 
         /** @var list<Route> $defaultRoutes */
         $defaultRoutes = require App::rootPath('config/routes.php');
-        $this->kernel = new Kernel($this->services, $routes ?? $defaultRoutes);
+        $this->routes = $routes ?? $defaultRoutes;
     }
 
     /**
@@ -77,7 +84,9 @@ final class TestApp
         array $query = [],
         array $cookies = [],
     ): Response {
-        return $this->kernel->handle(new Request($method, $path, $query, $server, $body, $cookies));
+        $this->services = ($this->makeServices)();
+
+        return (new Kernel($this->services, $this->routes))->handle(new Request($method, $path, $query, $server, $body, $cookies));
     }
 
     /**

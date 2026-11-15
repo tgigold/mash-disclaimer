@@ -241,7 +241,7 @@ final class AdminTest extends DatabaseTestCase
         self::assertNotNull($carol);
         self::assertStringStartsWith('$argon2id$', $carol['password_hash']);
         self::assertSame(303, $this->login($this->browser(), 'carol', 'another long password')->status);
-        self::assertStringContainsString('Admin "carol" created.', $this->get($browser, '/admin/users')->body);
+        self::assertStringContainsString('Admin &quot;carol&quot; created.', $this->get($browser, '/admin/users')->body);
     }
 
     public function testCreateUserValidation(): void

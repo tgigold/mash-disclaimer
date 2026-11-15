@@ -76,7 +76,8 @@ jobs:
           php -S 127.0.0.1:8080 -t public > "$RUNNER_TEMP/php-server.log" 2>&1 &
           google-chrome --headless=new --disable-gpu --no-first-run --remote-debugging-port=9222 \
             --user-data-dir="$RUNNER_TEMP/chrome" about:blank > "$RUNNER_TEMP/chrome.log" 2>&1 &
-          for i in $(seq 1 50); do
+          # Chrome needs up to several seconds on a cold runner; wait up to 60 s.
+          for i in $(seq 1 300); do
             curl --silent --fail http://127.0.0.1:9222/json/version > /dev/null \
               && curl --silent --fail http://127.0.0.1:8080/health > /dev/null && exit 0
             sleep 0.2

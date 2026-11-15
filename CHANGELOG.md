@@ -13,6 +13,10 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 - Vorschläge „Try:“ mit den Modellreihen, die die meisten Live-Fahrzeuge haben.
 - Browser-Tests für Such-JavaScript und Theme-Umschalter in der CI (Chrome über das DevTools-Protokoll, ohne npm).
 
+### Behoben
+
+- Die CI wartet bis zu 60 Sekunden auf den Start von Chrome; nach 10 Sekunden war der Deploy von #6 abgebrochen, weil Chrome auf dem Runner langsamer startete.
+
 ## [4.1.0] – 2026-11-15
 
 ### Hinzugefügt

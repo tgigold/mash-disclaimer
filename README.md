@@ -178,7 +178,7 @@ GET /api/v1/search?q=i5&limit=5
       "type_code": "Z0007",
       "series": "G60",
       "drivetrain": "BEV",
-      "disclaimer": "BMW i5 eDrive40 Sedan. WLTP energy consumption combined: …",
+      "disclaimer": "BMW i5 eDrive40 Sedan. Mandatory information according to German law 'Pkw-EnVKV' based on WLTP: energy consumption combined: …",
       "url": "/vehicles/7K3QX9MB/bmw-i5-edrive40-sedan"
     }
   ],

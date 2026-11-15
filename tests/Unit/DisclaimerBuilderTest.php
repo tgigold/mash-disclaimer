@@ -59,8 +59,8 @@ final class DisclaimerBuilderTest extends TestCase
     public function testBev(): void
     {
         self::assertSame(
-            'BMW i5 eDrive40 Sedan. WLTP energy consumption combined: 18.9-15.9 kWh/100 km; '
-            . 'WLTP CO₂ emissions combined: 0 g/km; CO₂ class: A; WLTP electric range: 582-497 km.',
+            'BMW i5 eDrive40 Sedan. Mandatory information according to German law \'Pkw-EnVKV\' based on WLTP: energy consumption combined: 18.9-15.9 kWh/100 km; '
+            . 'CO₂ emissions combined: 0 g/km; CO₂ class: A; electric range: 582-497 km.',
             $this->builder->build(Drivetrain::BEV, 'BMW i5 eDrive40 Sedan', [
                 'electric_consumption' => '18.9-15.9', 'co2_class' => 'A', 'electric_range' => '582-497',
             ]),

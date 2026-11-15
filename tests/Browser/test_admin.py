@@ -54,7 +54,7 @@ def test_new_vehicle_fields_follow_type_and_preview_updates():
     set_value(b, '#v-electric_range', '400.0 / 420.0')
     text = b.wait(f'{PREVIEW}.startsWith("Browser Test BEV.") && {PREVIEW}', timeout=5)
     assert '15.5-14.0 kWh/100 km' in text, text
-    assert 'WLTP electric range: 420-400 km.' in text, text
+    assert 'electric range: 420-400 km.' in text, text
 
 
 def test_preview_names_the_problem():
@@ -71,7 +71,7 @@ def test_editing_a_live_vehicle_previews_the_new_name():
     b.js('document.querySelector(".vehicle-name a").click()')
     b.wait('document.querySelector("[data-vehicle-form]") && document.readyState === "complete"', timeout=10)
     set_value(b, '#v-name', 'Renamed i5')
-    b.wait(f'{PREVIEW}.startsWith("Renamed i5. WLTP energy consumption combined")', timeout=5)
+    b.wait(f'{PREVIEW}.startsWith("Renamed i5. Mandatory information according to German law")', timeout=5)
 
 
 def main():

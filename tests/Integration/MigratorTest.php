@@ -44,9 +44,9 @@ final class MigratorTest extends DatabaseTestCase
     {
         $applied = $this->migrator()->migrate();
 
-        self::assertSame(['0001_initial_schema'], $applied);
+        self::assertSame(['0001_initial_schema', '0002_login_protection'], $applied);
         self::assertSame(
-            ['v4_audit_log', 'v4_migrations', 'v4_settings', 'v4_users', 'v4_vehicles', 'v4_vehicles_live'],
+            ['v4_audit_log', 'v4_known_devices', 'v4_login_attempts', 'v4_migrations', 'v4_settings', 'v4_users', 'v4_vehicles', 'v4_vehicles_live'],
             (new SchemaRepository($this->pdo))->projectTables(),
         );
         self::assertSame([], $this->migrator()->pending());
@@ -73,14 +73,14 @@ final class MigratorTest extends DatabaseTestCase
         $this->migrator()->migrate();
 
         self::assertSame([], $this->migrator()->migrate());
-        self::assertSame(1, $this->countRows('SELECT COUNT(*) FROM v4_migrations'));
+        self::assertSame(2, $this->countRows('SELECT COUNT(*) FROM v4_migrations'));
     }
 
     public function testBackupIsWrittenBeforeANewMigration(): void
     {
         $this->migrator()->migrate();
         $this->pdo->exec("INSERT INTO v4_settings (name, value, updated_at) VALUES ('probe', 'it''s here', UTC_TIMESTAMP())");
-        file_put_contents($this->migrations . '/0002_probe.php', <<<'PHP'
+        file_put_contents($this->migrations . '/0099_probe.php', <<<'PHP'
             <?php
             return new class implements Lab09\Disclaimer\Database\Migration {
                 public function description(): string { return 'Probe'; }
@@ -88,7 +88,7 @@ final class MigratorTest extends DatabaseTestCase
             };
             PHP);
 
-        self::assertSame(['0002_probe'], $this->migrator()->migrate());
+        self::assertSame(['0099_probe'], $this->migrator()->migrate());
 
         $backups = glob($this->data->path . '/backups/*-before-migration.sql.gz') ?: [];
         self::assertCount(1, $backups);
@@ -101,7 +101,7 @@ final class MigratorTest extends DatabaseTestCase
     public function testFailingMigrationStopsWithItsName(): void
     {
         $this->migrator()->migrate();
-        file_put_contents($this->migrations . '/0002_broken.php', <<<'PHP'
+        file_put_contents($this->migrations . '/0099_broken.php', <<<'PHP'
             <?php
             return new class implements Lab09\Disclaimer\Database\Migration {
                 public function description(): string { return 'Broken'; }
@@ -113,10 +113,10 @@ final class MigratorTest extends DatabaseTestCase
             $this->migrator()->migrate();
             self::fail('The migration should have failed.');
         } catch (\RuntimeException $e) {
-            self::assertStringContainsString('Migration 0002_broken failed', $e->getMessage());
+            self::assertStringContainsString('Migration 0099_broken failed', $e->getMessage());
         }
 
-        self::assertSame(['0002_broken'], $this->migrator()->pending());
+        self::assertSame(['0099_broken'], $this->migrator()->pending());
     }
 
     private function migrator(): Migrator

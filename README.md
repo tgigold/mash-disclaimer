@@ -49,7 +49,7 @@ Jeder Schritt ist ein Pull Request mit Tests, CHANGELOG und README-Pflege; jedes
 | 1 | Repo, Pflichtdateien, Grundgerüst, CI, Deployment | leere Seite im Design mit Hell/Dunkel, Health-Check grün | 4.0.0 |
 | 2 | Setup, Migrationen, Schema, Fake-Daten | Installation auf dem Webspace läuft durch | 4.1.0 |
 | 3 | Öffentliche Suche | Autovervollständigung, Treffer, Copy auf Fake-Daten | 4.2.0 |
-| 4 | Login, Nutzerverwaltung, Audit-Log | Admin-Bereich erreichbar und abgesichert | |
+| 4 | Login, Nutzerverwaltung, Audit-Log | Admin-Bereich erreichbar und abgesichert | in Arbeit |
 | 5 | Fahrzeugverwaltung | Liste, live/zurückziehen, bearbeiten, zurücksetzen, von Hand anlegen, Textgenerator | |
 | 6 | Import | Upload, Einlesen, Prüfschritt, Übernehmen, Frontend-Sperre | |
 | 7 | Ablösung V3 | Umzug auf `disclaimer.lab09.de`, V3 abschalten | |
@@ -90,6 +90,37 @@ Die Startseite ist die öffentliche Suche. Gesucht wird nur in Live-Fahrzeugen, 
 - Jedes Fahrzeug hat eine feste Adresse `/vehicles/{id}/{slug}`. Der Slug ist Kosmetik; ein falscher oder fehlender leitet per 301 auf den richtigen um (`A-5`).
 - Unter dem leeren Feld schlägt „Try:“ die Modellreihen mit den meisten Live-Fahrzeugen vor.
 - Rate-Limit: 120 Seitenaufrufe bzw. 300 API-Anfragen pro Minute und gekürzter IP. Gezählt wird in `data/ratelimit/` mit gehashten Schlüsseln, ältere Minuten werden laufend gelöscht.
+
+## Admin-Bereich
+
+Unter `/admin`, erreichbar über „Dashboard“ in der Fußzeile. Jede Seite dort braucht eine Anmeldung; wer nicht angemeldet ist, landet auf `/login` und danach wieder auf der gewünschten Seite.
+
+| Bereich | Inhalt |
+|---|---|
+| Dashboard | Kennzahlen (Fahrzeuge, live, Entwürfe, aktive Admins), Hinweis auf ausstehende Updates. Die Fahrzeugliste kommt mit Schritt 5. |
+| Users | Admins anlegen, neues Passwort setzen, deaktivieren und reaktivieren. Jede Aktion fragt das eigene Passwort ab (`S-35`). Das letzte aktive Konto lässt sich nicht deaktivieren. |
+| Change history | das Audit-Log, neueste zuerst, 50 je Seite |
+| Updates | ausstehende Datenbank-Migrationen ansehen und mit Backup ausführen (`G-12`) |
+| Konto (Name oben rechts) | eigenes Passwort ändern, eigene Daten als JSON herunterladen, eigenes Konto löschen (`D-8`) |
+
+**Anmeldung und Sitzungen**
+
+- Passwörter mit Argon2id, 12 bis 1024 Zeichen, ohne Vorgaben zur Zusammensetzung (`S-27`, `S-28`). Passwort vergessen: Ein anderer Admin setzt ein neues (Abweichung von `S-29`, siehe Steckbrief).
+- Die Login-Meldung verrät nicht, ob es ein Konto gibt (`S-30`).
+- Sperre (`S-31`): nach 5 Fehlversuchen pro IP oder 25 insgesamt ist der Login 15 Minuten gesperrt. Geräte, die sich schon einmal erfolgreich angemeldet haben, sind von der globalen Sperre ausgenommen. Dafür setzt der Login das Cookie `__Host-tater-device` (1 Jahr, nur als Hash gespeichert).
+- Eine Sitzung endet nach 2 Stunden ohne Aktivität und spätestens 12 Stunden nach der Anmeldung (`S-11`; in der Config `session_idle_minutes`, `session_absolute_hours`).
+- Ein neues Passwort oder das Deaktivieren beendet alle Sitzungen des Kontos auf allen Geräten (`S-10`). Wer das eigene Passwort ändert, bleibt im aktuellen Browser angemeldet.
+- Seiten im Admin-Bereich werden nie zwischengespeichert (`Cache-Control: no-store`, `S-7`).
+
+**Aufbewahrung** (`D-6`, `D-7`) – gelöscht wird beim Aufruf der Login-Seite und bei jeder Anmeldung, Cronjobs braucht es nicht:
+
+| Daten | Frist |
+|---|---|
+| Fehlversuche beim Login mit voller IP | 15 Minuten (Dauer der Sperre) |
+| bekannte Geräte | 1 Jahr nach der letzten Nutzung |
+| gekürzte IPs im Audit-Log | 90 Tage |
+| Einträge im Audit-Log | 24 Monate |
+| Fehler-Log | Größe begrenzt auf 2 × 1 MB |
 
 ## API
 
@@ -203,7 +234,7 @@ Per SSH im Projektverzeichnis. Auf dem Webspace ist `php` noch Version 8.3, desh
 | `php85 bin/console backup` | Backup aller `v4_`-Tabellen nach `data/backups/` |
 | `php85 bin/console sample-data:load` / `:remove` | Beispielfahrzeuge anlegen / entfernen |
 
-Die Migrationen im Browser kommen mit dem Admin-Bereich (Schritt 4/5).
+Im Browser stehen die Migrationen unter **Admin → Updates**. Ausnahme ist `0002_login_protection`: Der Login braucht ihre Tabellen, deshalb läuft sie einmalig per `php85 bin/console migrate`.
 
 ## Konfiguration
 
@@ -256,7 +287,7 @@ Ist ein Schlüssel verbrannt (`S-47`): neuen Schlüssel nach Schritt 1–5 erzeu
 - **Fehler** landen in `data/logs/error.log` (per SFTP lesbar, über das Web gesperrt). Die Datei wird bei 1 MB nach `error.log.1` rotiert, es gibt also höchstens zwei Dateien (`S-50`, `S-51`). Bisher stehen darin keine personenbezogenen Daten.
 - **Backups:** Vor jeder Migration entsteht automatisch ein gzip-komprimierter SQL-Dump aller `v4_`-Tabellen unter `data/backups/`; die 30 neuesten bleiben erhalten. Zurückspielen per phpMyAdmin oder `zcat <datei> | mysql …`.
 - **Updates** kommen per Merge auf `main`; Datenbank-Migrationen werden danach bewusst ausgelöst (`H-15`): `php85 bin/console migrate`.
-- **Audit-Log:** Setup, Anlegen von Admins und Laden der Beispieldaten stehen in `v4_audit_log`, mit gekürzter IP (`D-6`). Die Aufbewahrungsfrist wird mit der „Change history“ in Schritt 4 festgelegt.
+- **Audit-Log:** Setup, An- und Abmeldungen, Nutzerverwaltung, Updates und Beispieldaten stehen in `v4_audit_log`, mit gekürzter IP (`D-6`). Fristen siehe „Aufbewahrung“ unter Admin-Bereich.
 - **Suchmaschinen** sind ausgesperrt: `X-Robots-Tag: noindex, nofollow` auf jeder Antwort und `robots.txt` mit `Disallow: /`.
 
 ## Lizenz

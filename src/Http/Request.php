@@ -14,6 +14,7 @@ final readonly class Request
      * @param array<string, string> $server
      * @param array<string, mixed> $body Parsed POST body, types untouched so
      *                                   validation can reject arrays (E-2)
+     * @param array<string, string> $cookies
      */
     public function __construct(
         public string $method,
@@ -21,6 +22,7 @@ final readonly class Request
         public array $query = [],
         public array $server = [],
         public array $body = [],
+        public array $cookies = [],
     ) {
     }
 
@@ -38,6 +40,7 @@ final readonly class Request
             self::strings($_GET),
             self::strings($_SERVER),
             $body,
+            self::strings($_COOKIE),
         );
     }
 

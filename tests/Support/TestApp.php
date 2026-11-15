@@ -28,45 +28,65 @@ final class TestApp
 
     public readonly ArraySession $session;
 
-    public readonly Services $services;
+    /** The services of the latest request – like in production, one set per request. */
+    public Services $services;
 
-    private Kernel $kernel;
+    /** @var \Closure(): Services */
+    private \Closure $makeServices;
+
+    /** @var list<Route> */
+    private array $routes;
 
     /**
      * @param list<Route>|null $routes
      * @param \Closure(DatabaseSettings): PDO|null $connect
+     * @param \Closure(): int|null $clock
      */
     public function __construct(
         ?Config $config = null,
         ?array $routes = null,
         ?\Closure $connect = null,
         int $phpVersionId = 80500,
+        ?\Closure $clock = null,
+        ?DataDirectory $data = null,
     ) {
-        $this->data = new DataDirectory(sys_get_temp_dir() . '/tater-test-' . bin2hex(random_bytes(6)));
+        $this->data = $data ?? new DataDirectory(sys_get_temp_dir() . '/tater-test-' . bin2hex(random_bytes(6)));
         $this->session = new ArraySession();
-        $this->services = new Services(
-            $config ?? Config::withDefaults(),
+        $config ??= Config::withDefaults();
+        $this->makeServices = fn (): Services => new Services(
+            $config,
             $this->data,
             $this->session,
             new View(App::rootPath('templates')),
             new ErrorLog($this->data),
             $connect,
             $phpVersionId,
+            $clock,
         );
+        $this->services = ($this->makeServices)();
 
         /** @var list<Route> $defaultRoutes */
         $defaultRoutes = require App::rootPath('config/routes.php');
-        $this->kernel = new Kernel($this->services, $routes ?? $defaultRoutes);
+        $this->routes = $routes ?? $defaultRoutes;
     }
 
     /**
      * @param array<string, mixed> $body
      * @param array<string, string> $server
      * @param array<string, string> $query
+     * @param array<string, string> $cookies
      */
-    public function request(string $method, string $path, array $body = [], array $server = [], array $query = []): Response
-    {
-        return $this->kernel->handle(new Request($method, $path, $query, $server, $body));
+    public function request(
+        string $method,
+        string $path,
+        array $body = [],
+        array $server = [],
+        array $query = [],
+        array $cookies = [],
+    ): Response {
+        $this->services = ($this->makeServices)();
+
+        return (new Kernel($this->services, $this->routes))->handle(new Request($method, $path, $query, $server, $body, $cookies));
     }
 
     /**

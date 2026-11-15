@@ -37,6 +37,20 @@ final readonly class Response
         return new self($this->body, $this->status, [$name => $value] + $this->headers);
     }
 
+    /**
+     * A cookie with the attributes of S-8: __Host- prefix requires Secure and
+     * Path=/; HttpOnly and SameSite=Lax always.
+     */
+    public function withCookie(string $name, string $value, int $maxAge): self
+    {
+        return $this->withHeader('Set-Cookie', sprintf(
+            '%s=%s; Max-Age=%d; Path=/; Secure; HttpOnly; SameSite=Lax',
+            $name,
+            rawurlencode($value),
+            $maxAge,
+        ));
+    }
+
     public function header(string $name): ?string
     {
         foreach ($this->headers as $key => $value) {
@@ -52,7 +66,8 @@ final readonly class Response
     {
         http_response_code($this->status);
         foreach ($this->headers as $name => $value) {
-            header($name . ': ' . $value);
+            // Never replace an existing Set-Cookie: PHP's session cookie must survive.
+            header($name . ': ' . $value, strcasecmp($name, 'Set-Cookie') !== 0);
         }
         echo $this->body;
     }

@@ -48,7 +48,7 @@ Jeder Schritt ist ein Pull Request mit Tests, CHANGELOG und README-Pflege; jedes
 |---|---|---|---|
 | 1 | Repo, Pflichtdateien, Grundgerüst, CI, Deployment | leere Seite im Design mit Hell/Dunkel, Health-Check grün | 4.0.0 |
 | 2 | Setup, Migrationen, Schema, Fake-Daten | Installation auf dem Webspace läuft durch | 4.1.0 |
-| 3 | Öffentliche Suche | Autovervollständigung, Treffer, Copy auf Fake-Daten | |
+| 3 | Öffentliche Suche | Autovervollständigung, Treffer, Copy auf Fake-Daten | in Arbeit |
 | 4 | Login, Nutzerverwaltung, Audit-Log | Admin-Bereich erreichbar und abgesichert | |
 | 5 | Fahrzeugverwaltung | Liste, live/zurückziehen, bearbeiten, zurücksetzen, von Hand anlegen, Textgenerator | |
 | 6 | Import | Upload, Einlesen, Prüfschritt, Übernehmen, Frontend-Sperre | |
@@ -69,7 +69,7 @@ bin/               console (Kommandozeile)
 docs/              Fachlogik und Planung
 data/              nur auf dem Server: config.php, setup-code.txt, logs/, backups/ (später uploads/)
 deploy/            rsync-exclude.txt
-tests/             Unit/, Kernel/, Integration/ (gegen MariaDB), Support/
+tests/             Unit/, Kernel/, Integration/ (gegen MariaDB), Browser/ (Chrome), Support/
 .github/           CI, Deployment, Dependabot
 ```
 
@@ -80,6 +80,66 @@ tests/             Unit/, Kernel/, Integration/ (gegen MariaDB), Support/
 - Die Disclaimer-Texte entstehen in `DisclaimerBuilder` aus den Vorlagen in `config/disclaimer-templates.php`. Eine Vorlage darf nur die Felder ihres Fahrzeugtyps verwenden, sonst startet die App nicht.
 - Die Version steht nur in `src/App.php` (`G-5`); alle Asset-URLs tragen sie (`A-6`).
 - Fremde Dateien liegen unter `public/assets/vendor/<name>-<version>/` samt Lizenz; Stylesheets werden mit Subresource Integrity eingebunden, ein Test prüft die Hashes (`T-5`–`T-7`).
+
+## Suche
+
+Die Startseite ist die öffentliche Suche. Gesucht wird nur in Live-Fahrzeugen, in Name, Typschlüssel und Modellreihe. Jedes Wort muss vorkommen (UND), Groß- und Kleinschreibung spielen keine Rolle. Exakte Treffer auf Typschlüssel oder Reihe stehen oben.
+
+- **Ohne JavaScript** ist das Feld ein normales GET-Formular: `/?q=…` zeigt bei einem Treffer direkt den Disclaimer, bei mehreren eine Liste mit Links, sonst „No match“.
+- **Mit JavaScript** (`public/assets/js/search.js`) erscheinen beim Tippen Vorschläge. Pfeiltasten wählen aus, Enter zeigt das Fahrzeug, Esc schließt die Liste und leert beim zweiten Mal das Feld. Alles passiert ohne Seitenwechsel, der Fokus bleibt im Feld, die URL wird mitgeführt, und Zurück/Vor funktionieren. „Copy“ legt den Disclaimer in die Zwischenablage.
+- Jedes Fahrzeug hat eine feste Adresse `/vehicles/{id}/{slug}`. Der Slug ist Kosmetik; ein falscher oder fehlender leitet per 301 auf den richtigen um (`A-5`).
+- Unter dem leeren Feld schlägt „Try:“ die Modellreihen mit den meisten Live-Fahrzeugen vor.
+- Rate-Limit: 120 Seitenaufrufe bzw. 300 API-Anfragen pro Minute und gekürzter IP. Gezählt wird in `data/ratelimit/` mit gehashten Schlüsseln, ältere Minuten werden laufend gelöscht.
+
+## API
+
+Eine kleine, nur lesende JSON-API für das Suchfeld. Sie ist öffentlich und liefert genau das, was die öffentliche Seite zeigt. Antworten tragen immer `Content-Type: application/json; charset=utf-8`.
+
+### `GET /api/v1/search`
+
+| Parameter | Pflicht | Bedeutung |
+|---|---|---|
+| `q` | nein | Suchtext, höchstens 100 Zeichen; leer ergibt eine leere Liste |
+| `limit` | nein | 1 bis 20, Vorgabe 20 |
+
+```http
+GET /api/v1/search?q=i5&limit=5
+```
+
+```json
+{
+  "data": [
+    {
+      "id": "7K3QX9MB",
+      "name": "BMW i5 eDrive40 Sedan",
+      "type_code": "Z0007",
+      "series": "G60",
+      "drivetrain": "BEV",
+      "disclaimer": "BMW i5 eDrive40 Sedan. WLTP energy consumption combined: …",
+      "url": "/vehicles/7K3QX9MB/bmw-i5-edrive40-sedan"
+    }
+  ],
+  "meta": { "query": "i5", "count": 1 }
+}
+```
+
+### `GET /api/v1/vehicles/{id}`
+
+Ein Live-Fahrzeug, Felder wie oben unter `data`.
+
+### Fehler
+
+Einheitlich nach `API-5`:
+
+```json
+{ "error": { "code": "invalid_limit", "message": "Invalid limit.", "fields": { "limit": "integer from 1 to 20" } } }
+```
+
+| Status | `code` | Wann |
+|---|---|---|
+| 404 | `not_found` | unbekannter Endpunkt oder Fahrzeug nicht (mehr) live |
+| 422 | `invalid_query`, `invalid_limit` | Parameter ungültig; `fields` nennt Feld und erwartete Form, nie den Inhalt |
+| 429 | `rate_limited` | zu viele Anfragen; `Retry-After` nennt die Sekunden bis zur nächsten Minute |
 
 ## Lokale Entwicklung
 
@@ -99,6 +159,13 @@ TATER_TEST_DB_HOST=127.0.0.1 TATER_TEST_DB_NAME=tater_test TATER_TEST_DB_USER=ro
 ```
 
 Achtung: Die Tests löschen alle `v4_`-Tabellen dieser Datenbank.
+
+**Browser-Tests** (`tests/Browser/`, `Q-3`) prüfen das Such-JavaScript und den Theme-Umschalter in einem echten Chrome: Vorschläge, Tastatur, Treffer ohne Seitenwechsel, Zurück-Button, Copy samt Zwischenablage, Escaping und das Merken des Themes. Sie brauchen nur Python 3 und Chrome. Gesteuert wird Chrome über das DevTools-Protokoll mit einem kleinen Client aus der Standardbibliothek (`tests/Browser/cdp.py`), ohne npm und ohne Pakete. In der CI laufen sie gegen den eingebauten PHP-Server mit den Beispieldaten in eigener Datenbank. Lokal, wenn eine installierte Instanz unter `BASE_URL` läuft:
+
+```sh
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --remote-debugging-port=9222 --user-data-dir=/tmp/tater-chrome &
+BASE_URL=http://127.0.0.1:8000 DEBUG_PORT=9222 python3 -I tests/Browser/test_search.py
+```
 
 Der Server läuft mit PHP 8.5; `composer.json` verlangt deshalb `^8.5` und löst Abhängigkeiten für 8.5 auf. Damit lokal auch PHP 8.4 reicht, ist die Plattform-Prüfung von Composer abgeschaltet – Code nutzt deshalb keine Sprachmittel, die erst mit 8.5 kamen, solange lokal 8.4 läuft. Die CI testet mit 8.5.
 

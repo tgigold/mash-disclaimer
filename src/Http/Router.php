@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Lab09\Disclaimer\Http;
 
 /**
- * Finds the route for a method and path. Paths are matched exactly; parameters
- * arrive with the first route that needs them.
+ * Finds the route for a method and path, including path parameters.
  */
 final readonly class Router
 {
@@ -21,12 +20,13 @@ final readonly class Router
         $allowed = [];
 
         foreach ($this->routes as $route) {
-            if ($route->path !== $path) {
+            $params = $route->matchPath($path);
+            if ($params === null) {
                 continue;
             }
             // HEAD is answered like GET; the web server drops the body.
             if ($route->method === $method || ($method === 'HEAD' && $route->method === 'GET')) {
-                return RouteMatch::found($route);
+                return RouteMatch::found($route, $params);
             }
             $allowed[] = $route->method;
         }

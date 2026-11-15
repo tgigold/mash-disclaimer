@@ -234,6 +234,263 @@ body {
     font-size: 0.9rem;
 }
 
+.hero-home {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Suggestions under the search field: an overlay, so nothing below jumps */
+.search-suggestions {
+    position: absolute;
+    z-index: 10;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    right: 0;
+    max-height: 24rem;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0.4rem;
+    list-style: none;
+    text-align: left;
+    background: var(--tater-surface);
+    border: 1px solid var(--tater-border);
+    border-radius: 1.25rem;
+    box-shadow: var(--tater-shadow);
+    animation: tater-fade-in 0.12s ease-out;
+}
+
+.search-suggestion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.65rem 1rem;
+    border-radius: 0.85rem;
+    cursor: pointer;
+}
+
+.search-suggestion[aria-selected="true"],
+.search-suggestion:hover {
+    background: var(--tater-bg);
+}
+
+.search-suggestion-meta .badge-drivetrain,
+.result-list-meta .badge-drivetrain {
+    margin-right: 0.35rem;
+}
+
+.search-suggestion-name {
+    font-weight: 600;
+}
+
+.search-suggestion-meta {
+    flex-shrink: 0;
+    color: var(--tater-muted);
+    font-size: 0.875rem;
+}
+
+/* "Try:" chips */
+.search-chips {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.75rem;
+    color: var(--tater-muted);
+    font-size: 0.9rem;
+}
+
+.chip {
+    padding: 0.4rem 0.95rem;
+    color: var(--tater-text);
+    text-decoration: none;
+    border: 1px solid var(--tater-border);
+    border-radius: 999px;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.chip:hover,
+.chip:focus-visible {
+    background: var(--tater-surface);
+    border-color: var(--tater-violet);
+}
+
+/* Results */
+.results {
+    max-width: 44rem;
+    margin: 1.25rem auto 0;
+}
+
+.result-card,
+.result-list {
+    padding: 2rem 2.5rem;
+    text-align: left;
+    background: var(--tater-surface);
+    border-radius: 1.25rem;
+    box-shadow: var(--tater-shadow);
+    animation: tater-fade-in 0.18s ease-out;
+}
+
+.result-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.5rem;
+}
+
+.result-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--tater-muted);
+    margin-bottom: 1.25rem;
+}
+
+.badge-drivetrain {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    border-radius: 999px;
+    color: var(--tater-text);
+    background: var(--tater-bg);
+}
+
+.badge-mhev {
+    color: #fff;
+    background: var(--tater-violet);
+}
+
+.badge-phev {
+    color: #fff;
+    background: var(--tater-pink);
+}
+
+.badge-bev {
+    color: #fff;
+    background: var(--tater-blue);
+}
+
+[data-bs-theme="dark"] .badge-mhev,
+[data-bs-theme="dark"] .badge-phev,
+[data-bs-theme="dark"] .badge-bev {
+    color: var(--tater-bg);
+}
+
+.disclaimer {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.5rem 1.75rem;
+    background: var(--tater-bg);
+    border-radius: 1rem;
+}
+
+.disclaimer-text {
+    flex: 1;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.copy-button {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-width: 7rem;
+    justify-content: center;
+    border-radius: 0.75rem;
+}
+
+.copy-button.is-copied {
+    --bs-btn-bg: var(--tater-pink);
+    --bs-btn-border-color: var(--tater-pink);
+}
+
+.result-list-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--tater-muted);
+    margin-bottom: 0.75rem;
+}
+
+.result-list ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.result-list a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    margin: 0 -1rem;
+    color: var(--tater-text);
+    text-decoration: none;
+    border-radius: 0.85rem;
+}
+
+.result-list a:hover,
+.result-list a:focus-visible {
+    background: var(--tater-bg);
+}
+
+.result-list-name {
+    font-weight: 600;
+}
+
+.result-list-meta {
+    flex-shrink: 0;
+    color: var(--tater-muted);
+    font-size: 0.875rem;
+}
+
+.result-empty {
+    padding: 2.25rem 2rem;
+    text-align: center;
+    color: var(--tater-muted);
+    border: 1px dashed var(--tater-border);
+    border-radius: 1.25rem;
+    animation: tater-fade-in 0.18s ease-out;
+}
+
+.result-empty-title {
+    color: var(--tater-text);
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+}
+
+.result-empty p:last-child {
+    margin-bottom: 0;
+}
+
+@keyframes tater-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .result-card,
+    .result-list {
+        padding: 1.5rem;
+    }
+
+    .disclaimer {
+        flex-direction: column;
+    }
+}
+
 /* Panels: forms and messages such as the setup */
 .panel {
     max-width: 36rem;

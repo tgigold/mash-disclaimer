@@ -4,6 +4,15 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 
 ## [Unreleased]
 
+### Hinzugefügt
+
+- Öffentliche Suche auf der Startseite: Vorschläge beim Tippen, Tastaturbedienung (Pfeile, Enter, Esc), Treffer ohne Seitenwechsel, Trefferliste bei mehreren Fahrzeugen, „No match“, Copy-Button mit Rückmeldung; funktioniert auch ohne JavaScript als GET-Formular.
+- Feste Adresse je Fahrzeug unter `/vehicles/{id}/{slug}` mit Weiterleitung auf den richtigen Slug.
+- Lesende JSON-API `/api/v1/search` und `/api/v1/vehicles/{id}` mit einheitlichem Fehlerformat.
+- Rate-Limit pro Minute und gekürzter IP für Suche und API (`429` mit `Retry-After`).
+- Vorschläge „Try:“ mit den Modellreihen, die die meisten Live-Fahrzeuge haben.
+- Browser-Tests für Such-JavaScript und Theme-Umschalter in der CI (Chrome über das DevTools-Protokoll, ohne npm).
+
 ## [4.1.0] – 2026-11-15
 
 ### Hinzugefügt

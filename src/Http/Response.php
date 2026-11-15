@@ -21,7 +21,7 @@ final readonly class Response
     public static function json(array $data, int $status = 200): self
     {
         return new self(
-            json_encode($data, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES),
+            json_encode($data, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             $status,
             ['Content-Type' => 'application/json; charset=utf-8', 'Cache-Control' => 'no-store'],
         );

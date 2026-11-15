@@ -62,3 +62,33 @@ jobs:
           TATER_TEST_DB_PASSWORD: ''
         # --fail-on-skipped: in the CI every database test has to run.
         run: vendor/bin/phpunit --fail-on-skipped
+
+      # Q-3: browser tests for the search JavaScript. They run against the
+      # built-in PHP server with the sample vehicles in a separate database and
+      # drive the runner's Chrome via the DevTools protocol (tests/Browser/).
+      - name: Prepare app for browser tests
+        run: |
+          mysql --host=127.0.0.1 --user=root -e 'CREATE DATABASE tater_browser CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
+          mkdir -p data
+          php -r 'require "vendor/autoload.php"; file_put_contents("data/config.php", Lab09\Disclaimer\Config::export(["db" => ["host" => "127.0.0.1", "port" => 3306, "name" => "tater_browser", "user" => "root", "password" => ""]]));'
+          php bin/console migrate
+          php bin/console sample-data:load
+          php -S 127.0.0.1:8080 -t public > "$RUNNER_TEMP/php-server.log" 2>&1 &
+          google-chrome --headless=new --disable-gpu --no-first-run --remote-debugging-port=9222 \
+            --user-data-dir="$RUNNER_TEMP/chrome" about:blank > "$RUNNER_TEMP/chrome.log" 2>&1 &
+          for i in $(seq 1 50); do
+            curl --silent --fail http://127.0.0.1:9222/json/version > /dev/null \
+              && curl --silent --fail http://127.0.0.1:8080/health > /dev/null && exit 0
+            sleep 0.2
+          done
+          echo "Server or Chrome did not start"; cat "$RUNNER_TEMP/php-server.log" "$RUNNER_TEMP/chrome.log"; exit 1
+
+      - name: Browser tests
+        env:
+          BASE_URL: http://127.0.0.1:8080
+          DEBUG_PORT: '9222'
+        run: python3 -I tests/Browser/test_search.py
+
+      - name: Server log on failure
+        if: failure()
+        run: cat "$RUNNER_TEMP/php-server.log" data/logs/error.log 2>/dev/null || true

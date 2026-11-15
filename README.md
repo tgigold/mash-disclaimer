@@ -49,7 +49,7 @@ Jeder Schritt ist ein Pull Request mit Tests, CHANGELOG und README-Pflege; jedes
 | 1 | Repo, Pflichtdateien, Grundgerüst, CI, Deployment | leere Seite im Design mit Hell/Dunkel, Health-Check grün | 4.0.0 |
 | 2 | Setup, Migrationen, Schema, Fake-Daten | Installation auf dem Webspace läuft durch | 4.1.0 |
 | 3 | Öffentliche Suche | Autovervollständigung, Treffer, Copy auf Fake-Daten | 4.2.0 |
-| 4 | Login, Nutzerverwaltung, Audit-Log | Admin-Bereich erreichbar und abgesichert | in Arbeit |
+| 4 | Login, Nutzerverwaltung, Audit-Log | Admin-Bereich erreichbar und abgesichert | 4.3.0 |
 | 5 | Fahrzeugverwaltung | Liste, live/zurückziehen, bearbeiten, zurücksetzen, von Hand anlegen, Textgenerator | |
 | 6 | Import | Upload, Einlesen, Prüfschritt, Übernehmen, Frontend-Sperre | |
 | 7 | Ablösung V3 | Umzug auf `disclaimer.lab09.de`, V3 abschalten | |

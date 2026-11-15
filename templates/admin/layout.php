@@ -29,7 +29,7 @@ $nav = [
 <?= $view->render('partials/head', ['title' => $title]) ?>
 <body class="admin">
     <header class="admin-header">
-        <a class="admin-brand" href="/admin">
+        <a class="admin-brand" href="/" title="Go to the search">
             <span class="brand-dots" aria-hidden="true"><span></span><span></span><span></span></span>
             <?= e(App::NAME) ?>
         </a>

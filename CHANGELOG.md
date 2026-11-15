@@ -4,6 +4,8 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 
 ## [Unreleased]
 
+## [4.3.0] – 2026-11-15
+
 ### Hinzugefügt
 
 - Admin-Bereich unter `/admin` mit Anmeldung: Dashboard mit Kennzahlen, Nutzerverwaltung (anlegen, neues Passwort setzen, deaktivieren, reaktivieren), Change history aus dem Audit-Log, Updates für Datenbank-Migrationen im Browser, eigenes Konto (Passwort ändern, Daten herunterladen, Konto löschen).
@@ -11,6 +13,10 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 - Sensible Aktionen fragen das eigene Passwort erneut ab; ein neues Passwort oder das Deaktivieren beendet alle Sitzungen des Kontos.
 - Aufbewahrungsfristen: Login-Fehlversuche 15 Minuten, bekannte Geräte 1 Jahr, gekürzte IPs im Audit-Log 90 Tage, Audit-Log 24 Monate.
 - Migration `0002`: Tabellen für Login-Fehlversuche und bekannte Geräte.
+
+### Geändert
+
+- „Disclaimer Tool“ oben links im Admin-Bereich führt zur öffentlichen Suche.
 
 ## [4.2.0] – 2026-11-15
 
@@ -60,7 +66,8 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 - Jede Anfrage endete mit `403`: Die sperrende `.htaccess` im Projektverzeichnis galt auch für `public/`, weil Apache die `.htaccess` der Elternverzeichnisse mit auswertet. Gesperrt sind jetzt nur die Verzeichnisse neben `public/`.
 - Der Deploy bricht ab, bevor etwas übertragen wird, wenn ein Secret fehlt oder `DEPLOY_PATH` kein tiefer absoluter Pfad ist; ein leerer Pfad hätte rsync mit `--delete` auf `/` zielen lassen.
 
-[Unreleased]: https://github.com/tgigold/mash-disclaimer/compare/v4.2.0...HEAD
+[Unreleased]: https://github.com/tgigold/mash-disclaimer/compare/v4.3.0...HEAD
+[4.3.0]: https://github.com/tgigold/mash-disclaimer/releases/tag/v4.3.0
 [4.2.0]: https://github.com/tgigold/mash-disclaimer/releases/tag/v4.2.0
 [4.1.0]: https://github.com/tgigold/mash-disclaimer/releases/tag/v4.1.0
 [4.0.0]: https://github.com/tgigold/mash-disclaimer/releases/tag/v4.0.0

@@ -143,7 +143,7 @@ final class SearchTest extends DatabaseTestCase
     {
         $body = json_decode($this->get('/api/v1/search', ['q' => $q])->body, true);
         $names = array_column($body['data'] ?? [], 'name');
-        sort($names);
+        sort($names, SORT_STRING | SORT_FLAG_CASE);
 
         return $names;
     }

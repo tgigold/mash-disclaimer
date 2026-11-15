@@ -6,6 +6,15 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 
 ### Hinzugefügt
 
+- Öffentliche Suche auf der Startseite: Vorschläge beim Tippen, Tastaturbedienung (Pfeile, Enter, Esc), Treffer ohne Seitenwechsel, Trefferliste bei mehreren Fahrzeugen, „No match“, Copy-Button mit Rückmeldung; funktioniert auch ohne JavaScript als GET-Formular.
+- Feste Adresse je Fahrzeug unter `/vehicles/{id}/{slug}` mit Weiterleitung auf den richtigen Slug.
+- Lesende JSON-API `/api/v1/search` und `/api/v1/vehicles/{id}` mit einheitlichem Fehlerformat.
+- Rate-Limit pro Minute und gekürzter IP für Suche und API (`429` mit `Retry-After`).
+- Vorschläge „Try:“ mit den Modellreihen, die die meisten Live-Fahrzeuge haben.
+- Browser-Tests für Such-JavaScript und Theme-Umschalter in der CI (Chrome über das DevTools-Protokoll, ohne npm).
+
+### Hinzugefügt
+
 - Geführtes Setup unter `/setup`: Setup-Code aus `data/setup-code.txt`, Prüfung der Server-Voraussetzungen, Datenbank-Zugang, erster Admin (Argon2id), optional erfundene Beispielfahrzeuge; schreibt `data/config.php` und sperrt sich danach selbst.
 - Datenbankschema als Migration `0001`: Einstellungen, Admin-Konten, Audit-Log, Fahrzeuge (Work) und Live-Fahrzeuge, alles `utf8mb4`/InnoDB mit Präfix `v4_`.
 - Migrationen mit automatischem Backup vorher, per Kommandozeile `php85 bin/console migrate`.

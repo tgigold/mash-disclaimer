@@ -9,6 +9,7 @@ use Lab09\Disclaimer\Http\Request;
 use Lab09\Disclaimer\Http\Response;
 use Lab09\Disclaimer\Http\Route;
 use Lab09\Disclaimer\Http\Router;
+use Lab09\Disclaimer\Controller\ApiController;
 use Lab09\Disclaimer\Security\Csrf;
 use Lab09\Disclaimer\Security\PhpSession;
 use Lab09\Disclaimer\Support\DataDirectory;
@@ -79,7 +80,9 @@ final readonly class Kernel
 
         $route = $match->route;
         if ($route === null) {
-            return $this->notFound();
+            return str_starts_with($request->path, '/api/')
+                ? ApiController::error(404, 'not_found', 'Unknown endpoint.')
+                : $this->notFound();
         }
 
         // A-3: everything not marked public needs a login. The login arrives in
@@ -87,6 +90,21 @@ final readonly class Kernel
         // of 403 so nothing reveals which addresses exist (S-33).
         if ($route->access !== Access::Public) {
             return $this->notFound();
+        }
+
+        if ($route->rateLimitPerMinute !== null) {
+            $retryAfter = $this->services->rateLimiter()->hit(
+                Ip::shorten($request->remoteAddress()),
+                $route->method . ' ' . $route->path,
+                $route->rateLimitPerMinute,
+            );
+            if ($retryAfter !== null) {
+                $response = str_starts_with($request->path, '/api/')
+                    ? ApiController::error(429, 'rate_limited', 'Too many requests. Please wait a moment.')
+                    : $this->errorPage(429, 'Too many requests', 'Please wait a moment and try again.');
+
+                return $response->withHeader('Retry-After', (string) $retryAfter);
+            }
         }
 
         // S-12, S-14: every POST needs a valid token and must not come from a
@@ -102,7 +120,7 @@ final readonly class Kernel
         $controller = $this->services->controller($route->controller);
         $action = $route->action;
 
-        $response = $controller->$action($request);
+        $response = $controller->$action($request, $match->params);
         if (!$response instanceof Response) {
             throw new \LogicException(sprintf('%s::%s must return a Response.', $route->controller, $action));
         }

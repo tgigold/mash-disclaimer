@@ -29,6 +29,7 @@ $stylesheets = [
 <?php foreach ($stylesheets as $path): ?>
     <link rel="stylesheet" href="<?= e(Assets::url($path)) ?>"<?php if (Assets::integrity($path) !== null): ?> integrity="<?= e(Assets::integrity($path)) ?>"<?php endif ?>>
 <?php endforeach ?>
+    <script src="<?= e(Assets::url('js/search.js')) ?>" defer></script>
     <link rel="icon" href="<?= e(Assets::url('favicon.svg')) ?>" type="image/svg+xml">
 </head>
 <body>

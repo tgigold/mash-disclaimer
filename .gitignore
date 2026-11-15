@@ -19,3 +19,6 @@ AGENTS.md
 .DS_Store
 .idea/
 .vscode/
+
+# Python bytecode from the browser tests
+__pycache__/

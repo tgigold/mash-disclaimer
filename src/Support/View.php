@@ -40,6 +40,9 @@ final readonly class View
             require $__file;
         };
 
+        // Templates can render partials via $view->render(…).
+        $data += ['view' => $this];
+
         ob_start();
         try {
             $render($file, $data);

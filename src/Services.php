@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace Lab09\Disclaimer;
 
+use Lab09\Disclaimer\Controller\ApiController;
 use Lab09\Disclaimer\Controller\Controller;
 use Lab09\Disclaimer\Controller\HealthController;
 use Lab09\Disclaimer\Controller\HomeController;
 use Lab09\Disclaimer\Controller\SetupController;
 use Lab09\Disclaimer\Database\Database;
+use Lab09\Disclaimer\Repository\LiveVehicleRepository;
 use Lab09\Disclaimer\Security\Csrf;
+use Lab09\Disclaimer\Security\RateLimiter;
 use Lab09\Disclaimer\Security\Session;
 use Lab09\Disclaimer\Security\SetupCode;
 use Lab09\Disclaimer\Service\Installer;
+use Lab09\Disclaimer\Service\SearchService;
 use Lab09\Disclaimer\Support\DataDirectory;
 use Lab09\Disclaimer\Support\ErrorLog;
 use Lab09\Disclaimer\Support\View;
@@ -59,6 +63,16 @@ final class Services
         return $this->pdo;
     }
 
+    public function rateLimiter(): RateLimiter
+    {
+        return new RateLimiter($this->data);
+    }
+
+    public function search(): SearchService
+    {
+        return new SearchService($this->config->isInstalled() ? new LiveVehicleRepository($this->pdo()) : null);
+    }
+
     public function installer(): Installer
     {
         return new Installer($this->data, new SetupCode($this->data), $this->connect, $this->phpVersionId);
@@ -68,7 +82,8 @@ final class Services
     public function controller(string $class): Controller
     {
         return match ($class) {
-            HomeController::class => new HomeController($this->view),
+            HomeController::class => new HomeController($this->view, $this->search()),
+            ApiController::class => new ApiController($this->view, $this->search()),
             HealthController::class => new HealthController($this->view),
             SetupController::class => new SetupController(
                 $this->view,

@@ -22,6 +22,10 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 - Updates sind aus der Hauptnavigation auf die Seite Change history gewandert.
 - Im Prüfschritt des Imports sind neue Fahrzeuge nicht mehr vorausgewählt; ein Kästchen im Spaltenkopf wählt alle aus.
 
+### Behoben
+
+- Suche: Wer tippte und sofort Enter drückte, bekam manchmal kein Ergebnis, weil die verzögerten Vorschläge die volle Suche abbrachen und sich über das Ergebnis legten. Das galt auch für „Zurück“ im Browser. Vorschläge und volle Suche haben jetzt getrennte Anfragen, und Enter verwirft ausstehende Vorschläge.
+
 ## [4.4.0] – 2026-11-15
 
 ### Hinzugefügt

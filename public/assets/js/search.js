@@ -25,18 +25,24 @@
     let suggestions = [];
     let active = -1;
     let debounce = null;
-    let pending = null;
+    // One request per kind: a newer request replaces an older one of the same
+    // kind, but a suggestion never cancels a full search.
+    const pending = { suggest: null, search: null };
 
     // ---------- API ----------
 
-    const api = async (path) => {
-        if (pending) {
-            pending.abort();
-        }
-        pending = new AbortController();
+    const cancel = (kind) => {
+        pending[kind]?.abort();
+        pending[kind] = null;
+    };
+
+    const api = async (path, kind) => {
+        cancel(kind);
+        const controller = new AbortController();
+        pending[kind] = controller;
         const response = await fetch(path, {
             headers: { Accept: 'application/json' },
-            signal: pending.signal,
+            signal: controller.signal,
             credentials: 'same-origin',
         });
         if (!response.ok) {
@@ -208,7 +214,7 @@
             return;
         }
         try {
-            const body = await api(searchUrl(q, SUGGEST_LIMIT));
+            const body = await api(searchUrl(q, SUGGEST_LIMIT), 'suggest');
             if (input.value.trim() === q) {
                 openList(body.data);
             }
@@ -223,13 +229,17 @@
 
     const submit = async () => {
         const q = input.value.trim();
+        // Typed and pressed Enter at once: the suggestions due after the pause
+        // must not open over the result.
+        clearTimeout(debounce);
+        cancel('suggest');
         closeList();
         if (q === '') {
             show(null);
             return;
         }
         try {
-            const body = await api(searchUrl(q, 20));
+            const body = await api(searchUrl(q, 20), 'search');
             if (body.data.length === 1) {
                 showVehicle(body.data[0]);
                 return;
@@ -308,7 +318,7 @@
         if (link && !event.metaKey && !event.ctrlKey && !event.shiftKey) {
             event.preventDefault();
             try {
-                const body = await api(`/api/v1/vehicles/${encodeURIComponent(link.dataset.vehicleLink)}`);
+                const body = await api(`/api/v1/vehicles/${encodeURIComponent(link.dataset.vehicleLink)}`, 'search');
                 showVehicle(body.data);
                 input.focus();
             } catch (error) {

@@ -14,7 +14,7 @@ final class Config
 {
     /** @var array<string, mixed> */
     private const array DEFAULTS = [
-        // Canonical URL without trailing slash, e.g. https://tater.lab09.de.
+        // Canonical URL without trailing slash, e.g. https://disclaimer.lab09.de.
         // null until the setup has written the config; the HTTPS redirect in
         // public/.htaccess covers that phase.
         'base_url' => null,

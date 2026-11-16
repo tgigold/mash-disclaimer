@@ -4,6 +4,12 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 
 ## [Unreleased]
 
+## [4.6.0] – 2026-11-16
+
+### Geändert
+
+- Umzug auf `disclaimer.lab09.de` (Schritt 7). Kanonische Domain ist `base_url` in `data/config.php`; die `.htaccess` erzwingt nur HTTPS und eine bekannte Domain, damit sie PHP nie widerspricht. `tater.lab09.de` leitet per 301 weiter.
+
 ## [4.5.0] – 2026-11-15
 
 ### Hinzugefügt
@@ -107,7 +113,8 @@ Alle wichtigen Änderungen an diesem Projekt stehen hier. Das Format folgt [Keep
 - Jede Anfrage endete mit `403`: Die sperrende `.htaccess` im Projektverzeichnis galt auch für `public/`, weil Apache die `.htaccess` der Elternverzeichnisse mit auswertet. Gesperrt sind jetzt nur die Verzeichnisse neben `public/`.
 - Der Deploy bricht ab, bevor etwas übertragen wird, wenn ein Secret fehlt oder `DEPLOY_PATH` kein tiefer absoluter Pfad ist; ein leerer Pfad hätte rsync mit `--delete` auf `/` zielen lassen.
 
-[Unreleased]: https://github.com/tgigold/mash-disclaimer/compare/v4.5.0...HEAD
+[Unreleased]: https://github.com/tgigold/mash-disclaimer/compare/v4.6.0...HEAD
+[4.6.0]: https://github.com/tgigold/mash-disclaimer/releases/tag/v4.6.0
 [4.5.0]: https://github.com/tgigold/mash-disclaimer/releases/tag/v4.5.0
 [4.4.0]: https://github.com/tgigold/mash-disclaimer/releases/tag/v4.4.0
 [4.3.0]: https://github.com/tgigold/mash-disclaimer/releases/tag/v4.3.0

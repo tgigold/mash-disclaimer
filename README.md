@@ -2,7 +2,7 @@
 
 Verwaltet die WLTP-Verbrauchs- und CO₂-Werte von Fahrzeugen der BMW Group (BMW, MINI, BMW ALPINA) und erzeugt daraus fertige Disclaimer-Texte nach der deutschen Pkw-EnVKV. Die Suche ist öffentlich: Fahrzeug eingeben, Disclaimer kopieren. Gepflegt werden die Daten in einem Admin-Bereich hinter Login, gespeist aus der XLSX-Datei des Herstellers.
 
-V4 löst die bisherige Version 3 ab. In der Entwicklung läuft sie unter <https://tater.lab09.de>, danach unter `disclaimer.lab09.de`.
+V4 löst die bisherige Version 3 ab und läuft unter <https://disclaimer.lab09.de>. Die Entwicklungsadresse `tater.lab09.de` leitet dorthin weiter.
 
 ## Steckbrief
 
@@ -18,7 +18,7 @@ V4 löst die bisherige Version 3 ab. In der Entwicklung läuft sie unter <https:
 | **Fremde Dienste** | keine |
 | **Repo** | öffentlich · Lizenz: Unlicense |
 | **Server** | Shared Webspace (lab09.de) · PHP 8.5 (FPM) · Document Root zeigt auf `public/` · HTTPS |
-| **Deployment** | rsync über SSH, `main` ist live (in der Entwicklung `tater.lab09.de`) |
+| **Deployment** | rsync über SSH, `main` ist live unter `disclaimer.lab09.de` |
 | **Cronjobs** | keine |
 | **Coding-Regeln** | 1.3.0 |
 
@@ -52,7 +52,7 @@ Jeder Schritt ist ein Pull Request mit Tests, CHANGELOG und README-Pflege; jedes
 | 4 | Login, Nutzerverwaltung, Audit-Log | Admin-Bereich erreichbar und abgesichert | 4.3.0 |
 | 5 | Fahrzeugverwaltung | Liste, live/zurückziehen, bearbeiten, zurücksetzen, von Hand anlegen, Textgenerator | 4.4.0 |
 | 6 | Import | Upload, Einlesen, Prüfschritt, Übernehmen, Frontend-Sperre | 4.5.0 |
-| 7 | Ablösung V3 | Umzug auf `disclaimer.lab09.de`, V3 abschalten | |
+| 7 | Ablösung V3 | Umzug auf `disclaimer.lab09.de`, V3 abschalten | 4.6.0 |
 
 **Später:** Rollen, Passwort-Reset per E-Mail, Zwei-Faktor-Anmeldung (`S-29`, `S-38`); MINI und BMW ALPINA, sobald deren Dateien vorliegen.
 
@@ -239,7 +239,7 @@ Ohne `data/config.php` läuft die App mit den Defaults aus `src/Config.php`; Sta
 Nach dem ersten Deploy einmalig im Browser (`G-11`):
 
 1. **Datenbank anlegen:** beim Hoster eine leere MySQL/MariaDB-Datenbank mit eigenem Benutzer nur für dieses Projekt (`G-16`, `S-46`).
-2. **`/setup` aufrufen**, z. B. `https://tater.lab09.de/setup`. Beim ersten Aufruf entsteht `data/setup-code.txt`.
+2. **`/setup` aufrufen**, z. B. `https://disclaimer.lab09.de/setup`. Beim ersten Aufruf entsteht `data/setup-code.txt`.
 3. **Setup-Code per SFTP lesen** und im Formular eingeben – ohne ihn kann niemand die Instanz übernehmen, der nicht auf den Server kommt.
 4. **Formular ausfüllen:** Adresse der Installation, Datenbank-Zugang, erster Admin (Passwort mindestens 12 Zeichen). Optional die erfundenen Beispielfahrzeuge.
 5. Das Setup prüft PHP-Version und Erweiterungen, legt die Tabellen per Migration an, erzeugt den ersten Admin (Argon2id), schreibt `data/config.php` (nur für den Eigentümer lesbar) und löscht den Setup-Code. Danach antwortet `/setup` mit `404`.
@@ -290,6 +290,8 @@ Die Config mit Zugangsdaten liegt auf dem Server unter `data/config.php`, außer
 | `trusted_proxies` | IPs von Reverse-Proxys, deren `X-Forwarded-Proto` gilt (sonst leer) |
 | `db` | `host`, `port`, `name`, `user`, `password` der Datenbank; ohne diesen Schlüssel gilt die App als nicht installiert |
 
+**Domain wechseln:** Die Subdomain beim Hoster auf `public/` zeigen lassen, dann `base_url` in `data/config.php` ändern. Ist die neue Domain noch nicht in der Bedingung `RewriteCond %{HTTP_HOST}` in [public/.htaccess](public/.htaccess) enthalten, gehört sie dort per Pull Request dazu. Die `.htaccess` leitet nur unbekannte Hosts um, die eigentliche Weiterleitung auf `base_url` macht PHP. Deshalb können sich die beiden nie im Kreis schicken, egal in welcher Reihenfolge man ändert.
+
 ## Deployment
 
 Jeder Merge auf `main` geht nach grüner CI automatisch live (`H-9`, `H-11`):
@@ -297,7 +299,7 @@ Jeder Merge auf `main` geht nach grüner CI automatisch live (`H-9`, `H-11`):
 1. `.github/workflows/deploy.yml` ruft die CI auf dem gemergten Stand auf.
 2. Composer installiert ohne Entwicklungspakete, `vendor/` bekommt eine sperrende `.htaccess`.
 3. rsync über SSH überträgt das Projekt. Was in [deploy/rsync-exclude.txt](deploy/rsync-exclude.txt) steht – vor allem `data/` mit Config, Logs, Uploads und Backups –, wird weder hochgeladen noch auf dem Server gelöscht (`H-13`).
-4. Der Workflow ruft den Health-Check <https://tater.lab09.de/health> auf; antwortet er nicht mit `200`, schlägt das Deployment sichtbar fehl (`H-14`).
+4. Der Workflow ruft den Health-Check <https://disclaimer.lab09.de/health> auf; antwortet er nicht mit `200`, schlägt das Deployment sichtbar fehl (`H-14`).
 
 **Zugangsdaten:** Host, Benutzer, Zielpfad, privater Deploy-Schlüssel und Host-Key liegen ausschließlich als Secrets im GitHub-Environment `production` (`SSH_HOST`, `SSH_USER`, `SSH_KEY`, `SSH_KNOWN_HOSTS`, `DEPLOY_PATH`), die Health-Check-URL als Variable `HEALTH_URL`. Der Deploy-Schlüssel gehört nur zu diesem Projekt (`S-46`). Zugriff haben die Maintainer des Repos.
 
@@ -319,7 +321,7 @@ Einmalig beim Aufsetzen des Projekts, oder wenn der Deploy-Schlüssel ersetzt we
    gh secret set SSH_HOST        --env production
    gh secret set SSH_USER        --env production
    gh secret set DEPLOY_PATH     --env production   # Projektverzeichnis, das public/ enthält
-   gh variable set HEALTH_URL    --env production --body 'https://tater.lab09.de/health'
+   gh variable set HEALTH_URL    --env production --body 'https://disclaimer.lab09.de/health'
    ```
 5. **Privaten Schlüssel löschen:** `rm deploy_key` – er liegt danach nur noch in GitHub.
 6. **Probelauf:** Vor dem ersten Deploy `rsync --dry-run` gegen den Server laufen lassen, damit nichts Unerwartetes gelöscht wird.

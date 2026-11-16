@@ -72,7 +72,7 @@ $field = static function (
 
         <fieldset class="mb-4">
             <legend>Address</legend>
-            <?php $field('base_url', 'Address of this installation', 'url', 'With https://, without a path, e.g. https://tater.lab09.de') ?>
+            <?php $field('base_url', 'Address of this installation', 'url', 'With https://, without a path, e.g. https://disclaimer.lab09.de') ?>
         </fieldset>
 
         <fieldset class="mb-4">

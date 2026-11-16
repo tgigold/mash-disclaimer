@@ -12,7 +12,7 @@ final class App
 {
     public const string NAME = 'Disclaimer Tool';
 
-    public const string VERSION = '4.5.0';
+    public const string VERSION = '4.6.0';
 
     /** Project root, i.e. the directory above public/. */
     public static function rootPath(string $relative = ''): string

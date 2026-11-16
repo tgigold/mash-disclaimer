@@ -1,6 +1,7 @@
 # public/.htaccess – rules S-1 to S-5.
-# When the app moves to disclaimer.lab09.de (roadmap step 7), change the domain
-# here and in data/config.php.
+# The canonical domain is base_url in data/config.php: PHP redirects every other
+# known host there. This file only forces HTTPS and sends unknown hosts to the
+# canonical domain, so it can never disagree with PHP and loop.
 # The headers are deliberately not wrapped in <IfModule>: a missing mod_headers
 # must fail loudly instead of running without protection.
 
@@ -8,10 +9,11 @@ Options -Indexes -MultiViews
 
 RewriteEngine On
 
-# S-1: force HTTPS and the canonical domain, never redirect to the Host header
+# S-1: force HTTPS and a known domain, never redirect to the Host header.
+# tater.lab09.de was the development address; PHP sends it on to base_url.
 RewriteCond %{HTTPS} !=on [OR]
-RewriteCond %{HTTP_HOST} !=tater.lab09.de
-RewriteRule ^ https://tater.lab09.de%{REQUEST_URI} [R=301,L]
+RewriteCond %{HTTP_HOST} !^(disclaimer|tater)\.lab09\.de$
+RewriteRule ^ https://disclaimer.lab09.de%{REQUEST_URI} [R=301,L]
 
 # Block hidden files (.git, .env …), .well-known stays reachable
 RewriteRule (^|/)\.(?!well-known/) - [F]

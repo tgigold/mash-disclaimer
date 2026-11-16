@@ -23,7 +23,7 @@ final class ConfigTest extends TestCase
     {
         $config = Config::load(dirname(__DIR__, 2) . '/config/config.example.php');
 
-        self::assertSame('https://tater.lab09.de', $config->baseUrl());
+        self::assertSame('https://disclaimer.lab09.de', $config->baseUrl());
         self::assertSame(3306, $config->database()?->port);
     }
 

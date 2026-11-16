@@ -11,7 +11,7 @@ declare(strict_types=1);
 return [
     // Canonical URL without trailing slash; requests on any other host or via
     // plain HTTP are redirected here (S-1).
-    'base_url' => 'https://tater.lab09.de',
+    'base_url' => 'https://disclaimer.lab09.de',
 
     // Only needed behind a reverse proxy: its IP addresses (S-6).
     'trusted_proxies' => [],
